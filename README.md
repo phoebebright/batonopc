@@ -1,15 +1,30 @@
 # batonopc
 OPC in Baton
 
+IN DEVELOPMENT - Oct 2020
+
 Running test_opc.py
 --------------------
 
 Install requirements.txt
 
-python3 test_opc.py
+    python3 test_opc.py
 
 Expecting to hear fan start or change note, output displayed and fan stop.
 
+
+Collecting Data
+----------------
+
+    python3 log_data.py
+
+
+Upload to Gascloud
+-------------------
+
+See docs/uploading_to_gascloud.md to setup, then::
+
+    python3 pi_to_cloud.py
 
 
 

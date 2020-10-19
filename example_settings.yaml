@@ -3,8 +3,8 @@ API: https://thegascloud.com/api/v1
 GADGET_ID: TST_001
 GASCLOUD_KEY: DEMO
 UPLOAD_INTERVAL_SECS: 300
-BATCH_MODE: LIVE
-BATCH_TYPE: RASP
+BATCH_MODE: PASS
+BATCH_TYPE: OPC
 BATCH_DIR_PENDING: /home/pi/gascloud/batches2upload
 BATCH_DIR_UPLOADED: /home/pi/gascloud/batchesuploaded
 DELETE_BATCH_ON_UPLOAD: False

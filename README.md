@@ -66,49 +66,48 @@ and change alpha = opc.OPCN2(spi) to alpha = opc.OPCN3(spi)
 
 and magic!
 
-
-Key: Bin 0	Value: 0.0
-Key: Bin 1	Value: 0.0
-Key: Bin 2	Value: 0.0
-Key: Bin 3	Value: 0.0
-Key: Bin 4	Value: 0.0
-Key: Bin 5	Value: 0.0
-Key: Bin 6	Value: 0.0
-Key: Bin 7	Value: 0.0
-Key: Bin 8	Value: 0.0
-Key: Bin 9	Value: 0.0
-Key: Bin 10	Value: 0.0
-Key: Bin 11	Value: 0.0
-Key: Bin 12	Value: 0.0
-Key: Bin 13	Value: 0.0
-Key: Bin 14	Value: 0.0
-Key: Bin 15	Value: 0.0
-Key: Bin 16	Value: 0.0
-Key: Bin 17	Value: 0.0
-Key: Bin 18	Value: 0.0
-Key: Bin 19	Value: 0.0
-Key: Bin 20	Value: 0.0
-Key: Bin 21	Value: 0.0
-Key: Bin 22	Value: 0.0
-Key: Bin 23	Value: 0.0
-Key: Bin1 MToF	Value: 0.0
-Key: Bin3 MToF	Value: 0.0
-Key: Bin5 MToF	Value: 0.0
-Key: Bin7 MToF	Value: 0.0
-Key: Sampling Period	Value: 43.87
-Key: Sample Flow Rate	Value: 3.69
-Key: Temperature	Value: 22.50057221332112
-Key: Relative humidity	Value: 46.749065384908825
-Key: PM_A	Value: 0.0
-Key: PM_B	Value: 0.0
-Key: PM_C	Value: 0.0
-Key: Reject count Glitch	Value: 0
-Key: Reject count LongTOF	Value: 0
-Key: Reject count Ratio	Value: 0
-Key: Reject Count OutOfRange	Value: 0
-Key: Fan rev count	Value: 0
-Key: Laser status	Value: 608
-Key: Checksum	Value: 44240
+    Key: Bin 0	Value: 0.0
+    Key: Bin 1	Value: 0.0
+    Key: Bin 2	Value: 0.0
+    Key: Bin 3	Value: 0.0
+    Key: Bin 4	Value: 0.0
+    Key: Bin 5	Value: 0.0
+    Key: Bin 6	Value: 0.0
+    Key: Bin 7	Value: 0.0
+    Key: Bin 8	Value: 0.0
+    Key: Bin 9	Value: 0.0
+    Key: Bin 10	Value: 0.0
+    Key: Bin 11	Value: 0.0
+    Key: Bin 12	Value: 0.0
+    Key: Bin 13	Value: 0.0
+    Key: Bin 14	Value: 0.0
+    Key: Bin 15	Value: 0.0
+    Key: Bin 16	Value: 0.0
+    Key: Bin 17	Value: 0.0
+    Key: Bin 18	Value: 0.0
+    Key: Bin 19	Value: 0.0
+    Key: Bin 20	Value: 0.0
+    Key: Bin 21	Value: 0.0
+    Key: Bin 22	Value: 0.0
+    Key: Bin 23	Value: 0.0
+    Key: Bin1 MToF	Value: 0.0
+    Key: Bin3 MToF	Value: 0.0
+    Key: Bin5 MToF	Value: 0.0
+    Key: Bin7 MToF	Value: 0.0
+    Key: Sampling Period	Value: 43.87
+    Key: Sample Flow Rate	Value: 3.69
+    Key: Temperature	Value: 22.50057221332112
+    Key: Relative humidity	Value: 46.749065384908825
+    Key: PM_A	Value: 0.0
+    Key: PM_B	Value: 0.0
+    Key: PM_C	Value: 0.0
+    Key: Reject count Glitch	Value: 0
+    Key: Reject count LongTOF	Value: 0
+    Key: Reject count Ratio	Value: 0
+    Key: Reject Count OutOfRange	Value: 0
+    Key: Fan rev count	Value: 0
+    Key: Laser status	Value: 608
+    Key: Checksum	Value: 44240
 
 
 

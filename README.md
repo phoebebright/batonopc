@@ -1,7 +1,20 @@
 # batonopc
 OPC in Baton
 
-Connecting a Raspberry Pi with OPC-N3 using USB
+Running test_opc.py
+--------------------
+
+Install requirements.txt
+
+python3 test_opc.py
+
+Expecting to hear fan start or change note, output displayed and fan stop.
+
+
+
+
+
+INFORMATION ONLY - Connecting a Raspberry Pi with OPC-N3 using USB on PyCharm - the journey
 ------------------------------------------------
 
 The first challenge is there is not some out of the box code (that I can find Oct 2020) to do this.

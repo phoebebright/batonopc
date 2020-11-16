@@ -3,12 +3,16 @@ OPC in Baton
 
 IN DEVELOPMENT - Oct 2020
 
-Running test_opc.py
+Assumptions
+------------
+Time resolution is 1 second.  It is assumed that sub-second readings are not required.
+
+Running opc_test.py
 --------------------
 
 Install requirements.txt
 
-    python3 test_opc.py
+    python3 opc_test.py
 
 Expecting to hear fan start or change note, output displayed and fan stop.
 
@@ -17,6 +21,15 @@ Collecting Data
 ----------------
 
     python3 log_data.py
+    
+Data is logged to readings.csv 
+The csv file is a generic format:
+2 character record type
+integer seconds since start of file
+data values separated by comma
+
+The data values depend on the record type.
+The first record must be a 0 record type that says what time the data collection started at.
 
 
 Upload to Gascloud
@@ -26,6 +39,7 @@ See docs/uploading_to_gascloud.md to setup, then::
 
     python3 pi_to_cloud.py
 
+The data in readings.csv is used to create a new batch file 
 
 
 
@@ -139,4 +153,17 @@ and magic!
 
 
 
+
+Record Types
+-------------
+
+Record Type 0 - record the time the batch started in UTC
+~~~~~~~~~~~~~~
+seconds: 0
+value 1: year
+value 2: month
+value 3: day
+value 4: hour
+value 5: minute
+value 6: second
 

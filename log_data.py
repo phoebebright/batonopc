@@ -1,4 +1,5 @@
-from gascloud.ocpn3 import OPCN3
+from devices.ocpn3 import OPCN3
+
 
 import time
 import csv
@@ -12,42 +13,35 @@ from pathlib import Path
 def main():
 
 
-
     settings_file = os.path.join(Path.cwd(), "settings.yaml")
 
     pi = OPCN3(settings_file)
-    pi.create_readings_file()
-
-    with open(pi.readings_file_path, "a") as file:
-        csvwriter = csv.DictWriter(file, fieldnames=['rtype', 'seconds','temperature','rh','pm01','pm25','pm10'])
-
-        starttime = time.time()
-
-        pi.wake()
-
-        done = False
-        while not done:
-
-            try:
-                seconds = time.time() - starttime
-                reading = pi.get_particulates()
-
-                pi.write_reading({'rtype': 10, 'seconds': seconds,
-                                  'temperature': reading['temperature'],
-                                  'rh': reading['rh'],
-                                  'pm01': reading['pm01'],
-                                  'pm25': reading['pm25'],
-                                  'pm10': reading['pm10'],
-                                  }, csvwriter)
+    pi.connect2db()
 
 
+    starttime = time.time()
 
-                print(f"logging for {int(seconds)} seconds")
-                time.sleep(60)
+    pi.wake()
 
-            except KeyboardInterrupt:
-                done = True
-                pi.sleep()
+    done = False
+    print("Logging started.  Press Ctrl-C to stop.")
+    while not done:
+
+        try:
+
+            reading = pi.get_particulates()
+
+            pi.write_reading(pi.gadget_id, **reading)
+
+            print(f"logging  t:{reading['temp']}, rh: {reading['rh']}, pms: {reading['pm01']}, {reading['pm25']}, {reading['pm10']}")
+            time.sleep(10)
+
+        except KeyboardInterrupt:
+            done = True
+            pi.sleep()
+
+        except Exception as e:
+            print(f"Error {e}")
 
 
 if __name__ == '__main__':

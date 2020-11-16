@@ -1,0 +1,11 @@
+# note, must have space after colon before settings value
+DBNAME: ./test_readings.db
+DB_TABLE: Readings
+API: https://thegascloud.com/api/v1
+GASCLOUD_KEY: DEMO
+BATCH_MODE: PASS
+BATCH_TYPE: OPC
+BATCH_DIR_PENDING: /home/pi/gascloud/batches2upload
+BATCH_DIR_UPLOADED: /home/pi/gascloud/batchesuploaded
+DELETE_BATCH_ON_UPLOAD: False
+DELETE_READING_ON_ZIP: False

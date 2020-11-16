@@ -19,31 +19,30 @@ from pathlib import Path
 
 SETTINGS = "settings.yaml"
 
-VERSION = "1.1 Sep 2020"
+VERSION = "1.2 Nov 2020"
 
+class DataSource():
 
+    settings_file = "settings.yaml"
 
-class GasCloudInterface():
-    '''handle interface and uploading of data to gascloud from any device
-    running python.  No UI'''
+    source_ref_file = "source_ref.csv"
+
+    gadget_id = None
 
     db_name = None
     db_table = None
     db_headings = []
     db = None
-    settings_file = "settings.yaml"
-    device_key_file = "device_key.txt"
-    source_ref_file = "source_ref.csv"
+    connection = None
+
     cwd = None
-
-
 
 
     def __init__(self, settings_file=None, source_ref_file=None):
         '''
 
-        :param settings_file: full path to settings.yaml if not using default
-        :param source_ref_file: full path to source_ref.csv if not using default
+        :param settings_file: full path to device_settings.yaml if not using current path and/or default filename
+
         '''
 
         self.cwd = Path.cwd()
@@ -54,16 +53,79 @@ class GasCloudInterface():
 
         self.settings = self.read_settings(settings_file)
 
+        # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
+        self.gadget_id = self.settings['GADGET_ID']
+
+    def connect2db(self):
+        self.db_name = self.settings['DBNAME']
+        self.db_table = self.settings['DB_TABLE']
+
+        self.db = sqlite3.connect(self.db_name)
+        self.db.row_factory = sqlite3.Row
+
+        # create database and table if doesn't exist
+        self.create_table_if_not_exists()
+
+    def create_table_if_not_exists(self):
+        '''this format is for testing - each source of data will have it's own format'''
+
+        sql = f'''
+              CREATE TABLE IF NOT EXISTS {self.db_table} (
+              rdg_no integer PRIMARY KEY AUTOINCREMENT,
+              timestamp text NOT NULL,
+              gadget_id REAL,
+              temp REAL,
+              rh REAL,
+              raw_data VARCHAR
+              );
+              '''
+        self.db.execute(sql)
+
+    def write_reading(self, gadget_id, **readings):
+
+        timestamp = datetime.now()
+
+        sql = f'''
+              INSERT INTO {self.db_table} 
+                ('timestamp','gadget_id','temp','rh','raw_data')
+              VALUES ('{timestamp:%Y-%m-%d %H:%M}',
+                '{gadget_id}', 
+                {readings['temp']},
+                {readings['rh']},
+                '{readings['raw_data']}')
+              '''
+        self.db.execute(sql)
+
+    def read_last(self, gadget_id):
+
+        sql = f"SELECT * FROM {self.db_table} WHERE gadget_id = '{gadget_id}' ORDER BY timestamp DESC LIMIT 1"
+
+        result = self.db.execute(sql)
+
+        rowDict = dict(zip([c[0] for c in result.description], result.fetchone()))
+
+        return rowDict
+
+    def close_db(self):
+
+        self.db.close()
+
+    def read_settings(self, settings_file):
+
+        # assume if starts "/" then it is a full path, otherwise put current directory in front of it
+        # there is surely a safer way of doing this!
+        if not settings_file[0] == "/":
+            settings_file = os.path.join(self.cwd, settings_file)
+
+        with open(settings_file) as file:
+            settings = yaml.load(file, Loader=yaml.FullLoader)
+
+        return settings
+
         # get full path of source_ref and make sure we have one, creating if necessary
         if source_ref_file:
             self.source_ref_file = source_ref_file
         self.get_or_create_source_ref_file()
-
-        # check the device key is available - this is the key for the device that is uploading,
-        # not the device that is generating the data - although in this instance they are the same thing.
-
-        self.device_key = self.get_devicekey()
-
 
     def get_or_create_source_ref_file(self):
         '''convert filename to path and check file exists'''
@@ -77,28 +139,193 @@ class GasCloudInterface():
             with open(self.source_ref_file, "w") as file:
                 csvwriter = csv.DictWriter(file, fieldnames=["sequence", "timestamp", "source_ref"])
                 csvwriter.writeheader()
-                csvwriter.writerow({'sequence':0, 'timestamp':datetime.utcnow().isoformat(), 'source_ref': ""})
+                csvwriter.writerow({'sequence': 0, 'timestamp': datetime.utcnow().isoformat(), 'source_ref': ""})
+
+
+    def get_or_create_readings_file(self):
+        '''create readings csv file if doesn't already exist and return path to readings file'''
+
+        if not self.readings_file_path:
+            self.set_readings_file_path()
+
+        if not os.path.exists(self.readings_file_path):
+            with open(self.readings_file_path, "w") as file:
+                writer = csv.writer(file)
+                writer.writerow(["rtype", "seconds", "value1", "value2", "value3"])
+                writer.writerow([0, datetime.utcnow().isoformat(), "", "", ""])
+
+        return self.readings_file_path
+
+    def delete_readings_file(self):
+
+        if os.path.exists(self.readings_file_path):
+            os.remove(self.readings_file_path)
+            self.readings_file_path = None
+
+
+
+
+    def make_batch(self):
+            '''take data from readings.csv and create a batch from them the clear down readings.csv'''
+
+            #TODO: check readings file exists and has more than 1 line
+
+
+            if not os.path.exists(self.settings['BATCH_DIR_PENDING']):
+                os.mkdir(self.settings['BATCH_DIR_PENDING'])
+
+
+            if self.settings['GADGET_ID'] > ' ':
+                gadget_id = self.settings['GADGET_ID']
+
+            # check the device key is available - this is the key for the device that is uploading,
+            # not the device that is generating the data - although in this instance they are the same thing.
+            device_key = self.get_devicekey()
+
+
+            # create filename with date and load data from sqlite db
+            when = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            last_write = self.get_last_source_ref()
+            next_sequence = int(last_write['sequence'])+1
+            source_ref = "%s_%0.6d_%s" % (device_key, next_sequence, datetime.utcnow().strftime("%Y%m%d%H%M%S"))
+
+
+
+            fname = os.path.join(self.settings['BATCH_DIR_PENDING'],"%s.csv" % source_ref)
+
+            #TODO: work without having to stop logging
+
+            # move current readings file to pending directory and assuming method logging data will create a new readings file
+            os.rename(self.readings_file_path, fname)
+
+            #TODO: put something useful in range_written
+            range_written = [0,1]
+            # if no data, then nothing to do - might want to make a setting so downloads anyway
+            # if not range_written[0]:
+            #     print("No data to download")
+            #     return
+
+            # name of yamlfile to go with it
+            yamlfile = os.path.join(self.settings['BATCH_DIR_PENDING'], "%s.yaml" % source_ref)
+
+            # names of files we are going to upload
+            filelist = [fname,yamlfile]
+
+            # create yamlfile with details of our batch
+            self.make_yaml(yamlfile, self.settings['BATCH_TYPE'], self.settings['BATCH_MODE'], device_key, source_ref, when,  filelist, gadget_id=gadget_id, range_written=range_written)
+
+            # create zipfile but use the source_ref, it will be renamed when we have a batchid
+            tempzipname = os.path.join( self.settings['BATCH_DIR_PENDING'], "%s.zip" % source_ref)
+
+            zip_size, zip_md5 = self.make_zipfile(tempzipname, filelist)
+
+            # make yaml file with details of batch
+            payload = {
+                'key': device_key,
+                'source_ref': source_ref,
+                'filelist': "%s,%s" % (basename(filelist[0]), basename(filelist[1])),
+                'batch_type': self.settings['BATCH_TYPE'],
+                'batch_mode': self.settings['BATCH_MODE'],
+                'zip_size': zip_size,
+                'zip_md5': zip_md5,
+
+            }
+            payload_yaml_name = os.path.join(self.settings['BATCH_DIR_PENDING'], "%s.yaml" % source_ref)
+            self.make_payload_yaml(payload_yaml_name, payload)
+
+            self.put_next_source_ref(next_sequence, source_ref, zip_size, zip_md5, datetime.utcnow().isoformat())
+
+            # now delete readings so don't get duplicates
+            # delete readings now we have the zipfile
+
+            if self.settings['DELETE_READING_ON_ZIP']:
+                logger.info("Deleting readings between %s and %s" % (range_written[0], range_written[1]))
+                self.delete_readings_from_db(self.settings['DBNAME'], range_written[0], range_written[1])
+
+
+            logger.info("Created batch %s" % source_ref)
+
+            return device_key
+
+
+
+
+class GasCloudInterface():
+    '''handle interface and uploading of data to gascloud from any device
+    running python.  No UI'''
+
+
+    settings_file = "settings.yaml"
+    gateway_key_file = "gateway_key.txt"
+
+    data_sources = []
+
+
+
+    def __init__(self, settings_file=None, source_ref_file=None):
+        '''
+
+        :param settings_file: full path to settings.yaml if not using default
+        :param source_ref_file: full path to source_ref.csv if not using default
+
+        NOTE: a device key will be needed to upload to TheGasCloud - you can get a pin from thegascloud.com
+        website, then run register.py, enter the pin when requested and new key will be retrieved from thegascloud.com.
+        This steps requires internet access.
+        '''
+
+        self.cwd = Path.cwd()
+
+        # assume settings file is in current directory
+        if not settings_file:
+            settings_file = self.settings_file
+
+        self.settings = self.read_settings(settings_file)
+
+
+
+        # check the device key is available - this is the key for the device that is uploading,
+        # not the device that is generating the data - although in this instance they are the same thing.
+
+        self.device_key = self.get_devicekey()
+
+
+        # self.db_name = self.settings['DBNAME']
+        # self.db_table = self.settings['DB_TABLE']
+        # # create database and table if doesn't exist
+        # self.db = sqlite3.connect(self.db_name)
+
+        # self.create_table_if_not_exists()
+
 
 
     def create_table_if_not_exists(self):
 
-        raise NotImplemented
+        sql = f'''
+            CREATE TABLE IF NOT EXISTS {self.db_table} (
+            rdg_no integer PRIMARY KEY AUTOINCREMENT,
+            timestamp text NOT NULL,
+            temp REAL,
+            rh REAL
+            );
+            '''
+        self.db.execute(sql)
+
 
 
     def get_devicekey(self):
-        key_file = os.path.join(self.cwd, self.device_key_file)
+        key_file = os.path.join(self.cwd, self.gateway_key_file)
         try:
             f = open(key_file)
-            device_key = f.read()
+            self.gateway_key = f.read()
         except:
-            print('Device Key cannot be found')
-            return
+            print('Gateway Key cannot be found')
+            return None
 
-        if len(device_key) != 20:
+        if len(self.gateway_key) != 20:
             print("Invalid Device Key")
-            return
+            return None
 
-        return device_key
+        return self.gateway_key
 
     def make_yaml(self, yamlfile, batch_type, batch_mode, device_id, source_ref, when, filelist, gadget_id, range_written):
 
@@ -255,7 +482,7 @@ class GasCloudInterface():
             if len(batches_uploaded) < 1:
                 break
 
-            headers = {'Authorization': 'Bearer ' + self.device_key}
+            headers = {'Authorization': 'Bearer ' + self.gateway_key}
 
             for batch in batches_uploaded:
                 print("Checking status of batch %s" % batch)
@@ -298,7 +525,7 @@ class GasCloudInterface():
         if self.settings['GADGET_ID'] > ' ':
             payload['gadget_id'] = self.settings['GADGET_ID']
 
-        headers = {f'Authorization': 'Bearer {self.device_key}'}
+        headers = {f'Authorization': 'Bearer {self.gateway_key}'}
 
         response = requests.post(f"{self.settings['API']}/quarantine_request/" ,
                                  data=payload,
@@ -310,7 +537,7 @@ class GasCloudInterface():
             raise ValueError(f"Quaratine request FAILED: {response.reason}")
 
         # add device key - this can be removed when gascloud is updated to include this
-        creds['destination'] += f"{self.device_key}/inbox/"
+        creds['destination'] += f"{self.gateway_key}/inbox/"
 
         # rename zipfile and payload yaml with batchid now we have it (we will have to name back again if upload fails)
         zipfname = os.path.join(os.path.dirname(os.path.realpath(zipfile)), "%s.zip" % (creds["batchid"]))
@@ -327,7 +554,7 @@ class GasCloudInterface():
             raise
 
         print("Uploaded files %s to quarantine server %s to  %s" % (
-        payload['filelist'], creds['domain'], creds['destination']))
+            payload['filelist'], creds['domain'], creds['destination']))
 
         return creds['batchid']
 
@@ -340,7 +567,7 @@ class GasCloudInterface():
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(creds['domain'],
                     port=int(creds['port']),
-                    username=self.device_key,
+                    username=self.gateway_key,
                     password=creds['batchid'],
                     )
 

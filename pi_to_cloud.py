@@ -1,4 +1,4 @@
-from gascloud.ocpn3 import OPCN3
+from devices.ocpn3 import OPCN3
 import time
 import os
 from pathlib import Path
@@ -20,7 +20,7 @@ def main():
         seconds = time.time() - starttime
 
         # make batch of current data and put it in pending diretory
-        pi.make_batch()
+        key = pi.make_batch()
 
         # upload everything still in the pending directory
         pi.upload_all()

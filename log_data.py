@@ -34,7 +34,7 @@ def main():
             pi.write_reading(pi.gadget_id, **reading)
 
             print(f"logging  t:{reading['temp']}, rh: {reading['rh']}, pms: {reading['pm01']}, {reading['pm25']}, {reading['pm10']}")
-            time.sleep(10)
+            time.sleep(300)
 
         except KeyboardInterrupt:
             done = True

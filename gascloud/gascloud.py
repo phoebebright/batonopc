@@ -21,13 +21,11 @@ SETTINGS = "settings.yaml"
 
 VERSION = "1.2 Nov 2020"
 
-class DataSource():
+
+class ConnectDB():
+    '''simple class to connect and retrieve readings from database'''
 
     settings_file = "settings.yaml"
-
-    source_ref_file = "source_ref.csv"
-
-    gadget_id = None
 
     db_name = None
     db_table = None
@@ -35,17 +33,7 @@ class DataSource():
     db = None
     connection = None
 
-    cwd = None
-
-
-    def __init__(self, settings_file=None, source_ref_file=None):
-        '''
-
-        :param settings_file: full path to device_settings.yaml if not using current path and/or default filename
-
-        '''
-
-        self.cwd = Path.cwd()
+    def __init__(self, settings_file=None):
 
         # assume settings file is in current directory
         if not settings_file:
@@ -53,8 +41,23 @@ class DataSource():
 
         self.settings = self.read_settings(settings_file)
 
-        # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
-        self.gadget_id = self.settings['GADGET_ID']
+        self.connect2db()
+
+    def read_settings(self, settings_file):
+
+        # assume if starts "/" then it is a full path, otherwise put current directory in front of it
+        # there is surely a safer way of doing this!
+        if not settings_file[0] == "/":
+
+            settings_file = os.path.join(Path.cwd(), settings_file)
+
+        if not os.path.exists(settings_file):
+            raise ValueError(f"Settings file {settings_file} not found")
+
+        with open(settings_file) as file:
+            settings = yaml.load(file, Loader=yaml.FullLoader)
+
+        return settings
 
     def connect2db(self):
         self.db_name = self.settings['DBNAME']
@@ -65,6 +68,58 @@ class DataSource():
 
         # create database and table if doesn't exist
         self.create_table_if_not_exists()
+
+    def create_table_if_not_exists(self):
+         raise NotImplemented("Create function in class that generates data")
+
+
+    def delete_readings_from_db(self, from_reading, to_reading):
+        # get data to upload
+
+
+        with sqlite3.connect(self.db_name) as connection:
+            c = connection.cursor()
+
+            try:
+                c.execute(f'DELETE FROM {self.db_name} WHERE DataID BETWEEN {from_reading} AND {to_reading}')
+            except sqlite3.Error as e:
+                print("Database error: %s" % e)
+            except Exception as e:
+                print("Exception in _query: %s" % e)
+
+    def get_recent_readings(self):
+
+            sql = f"SELECT * FROM {self.db_table} ORDER BY timestamp DESC LIMIT 10"
+
+            result = self.db.execute(sql)
+
+            return result.fetchall()
+
+class DataSource(ConnectDB):
+
+    source_ref_file = "source_ref.csv"
+
+    gadget_id = None
+
+
+
+    def __init__(self, settings_file=None, source_ref_file=None):
+        '''
+
+        :param settings_file: full path to device_settings.yaml if not using current path and/or default filename
+
+        '''
+        super().__init__(settings_file)
+
+
+        # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
+        self.gadget_id = self.settings['GADGET_ID']
+
+
+        # get full path of source_ref and make sure we have one, creating if necessary
+        if source_ref_file:
+            self.source_ref_file = source_ref_file
+        self.get_or_create_source_ref_file()
 
     def create_table_if_not_exists(self):
         '''this format is for testing - each source of data will have it's own format'''
@@ -96,6 +151,7 @@ class DataSource():
               '''
         self.db.execute(sql)
 
+
     def read_last(self, gadget_id):
 
         sql = f"SELECT * FROM {self.db_table} WHERE gadget_id = '{gadget_id}' ORDER BY timestamp DESC LIMIT 1"
@@ -110,22 +166,8 @@ class DataSource():
 
         self.db.close()
 
-    def read_settings(self, settings_file):
 
-        # assume if starts "/" then it is a full path, otherwise put current directory in front of it
-        # there is surely a safer way of doing this!
-        if not settings_file[0] == "/":
-            settings_file = os.path.join(self.cwd, settings_file)
 
-        with open(settings_file) as file:
-            settings = yaml.load(file, Loader=yaml.FullLoader)
-
-        return settings
-
-        # get full path of source_ref and make sure we have one, creating if necessary
-        if source_ref_file:
-            self.source_ref_file = source_ref_file
-        self.get_or_create_source_ref_file()
 
     def get_or_create_source_ref_file(self):
         '''convert filename to path and check file exists'''
@@ -133,7 +175,7 @@ class DataSource():
         # assume if starts "/" then it is a full path, otherwise put current directory in front of it
         # there is surely a safer way of doing this!
         if not self.source_ref_file[0] == "/":
-            self.source_ref_file = os.path.join(self.cwd, self.source_ref_file)
+            self.source_ref_file = os.path.join(Path.cwd(), self.source_ref_file)
 
         if not os.path.exists(self.source_ref_file):
             with open(self.source_ref_file, "w") as file:
@@ -250,7 +292,7 @@ class DataSource():
 
 
 
-class GasCloudInterface():
+class GasCloudInterface(ConnectDB):
     '''handle interface and uploading of data to gascloud from any device
     running python.  No UI'''
 
@@ -273,13 +315,9 @@ class GasCloudInterface():
         This steps requires internet access.
         '''
 
-        self.cwd = Path.cwd()
+        super().__init__(settings_file=None)
 
-        # assume settings file is in current directory
-        if not settings_file:
-            settings_file = self.settings_file
 
-        self.settings = self.read_settings(settings_file)
 
 
 
@@ -298,17 +336,7 @@ class GasCloudInterface():
 
 
 
-    def create_table_if_not_exists(self):
 
-        sql = f'''
-            CREATE TABLE IF NOT EXISTS {self.db_table} (
-            rdg_no integer PRIMARY KEY AUTOINCREMENT,
-            timestamp text NOT NULL,
-            temp REAL,
-            rh REAL
-            );
-            '''
-        self.db.execute(sql)
 
 
 
@@ -357,12 +385,6 @@ class GasCloudInterface():
         with open(yamlfile, 'w') as file:
             documents = yaml.dump(content, file)
 
-    def read_settings(self, settings_file):
-
-        with open(settings_file) as file:
-            settings = yaml.load(file, Loader=yaml.FullLoader)
-
-        return settings
 
     def make_zipfile(self,zipfname, filelist):
         '''put files in filelist into a zip and return size (in kb) and md4'''
@@ -400,19 +422,7 @@ class GasCloudInterface():
 
         return firstrow, lastrow
 
-    def delete_readings_from_db(self, from_reading, to_reading):
-        # get data to upload
 
-
-        with sqlite3.connect(self.db_name) as connection:
-            c = connection.cursor()
-
-            try:
-                c.execute(f'DELETE FROM {self.db_name} WHERE DataID BETWEEN {from_reading} AND {to_reading}')
-            except sqlite3.Error as e:
-                print("Database error: %s" % e)
-            except Exception as e:
-                print("Exception in _query: %s" % e)
 
     def get_last_source_ref(self):
         '''get next number in sequence and return between optional prefix and suffix'''

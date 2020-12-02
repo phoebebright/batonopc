@@ -1,3 +1,6 @@
+'''this code is a low level test to check we wake up the OPCN3.
+Next try read_once_opcn3 to use more features of the library'''
+
 from usbiss.spi import SPI
 import opc
 

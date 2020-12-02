@@ -7,32 +7,59 @@ Assumptions
 ------------
 Time resolution is 1 second.  It is assumed that sub-second readings are not required.
 
-Running opc_test.py
---------------------
+Getting started
+---------------
 
 Install requirements.txt
+
+    pip3 install -r requirements.txt
+    
+    
+Testing connection to the OPCN3
+--------------------
+
+Connect OPCN3 to power and via USB to the pi
 
     python3 opc_test.py
 
 Expecting to hear fan start or change note, output displayed and fan stop.
 
+Check there is a settings.yaml file and try:
 
+    python3 read_once_opcn3.py
+    
+Expecting to see a single reading displayed
+
+    
+    
 Collecting Data
 ----------------
 
     python3 log_data.py
     
-Data is logged to an sqlite database
+Data is logged to an sqlite database every 10 secs while program runs
+
+Get latest reading from the database
+-----------------
+
+    python3 recent_readings.py
+    
+Display 10 recent readings
+
+Make a batch of data for Gascloud
+-------------------------
+
+    python3 make_batch.py
+    
+Creates a directory batches2upload and puts a zip file containing data ready to upload.
 
 
 Upload to Gascloud
 -------------------
 
-See docs/uploading_to_gascloud.md to setup, then::
-
     python3 pi_to_cloud.py
 
-The data in database that has not yet been added to a batch is written out to a csv file, along with a meta data yaml file and then placed in a pending directory ready to upload to the cloud.
+Push any batches in batches2upload to the gascloud.
 
 
 

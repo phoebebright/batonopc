@@ -138,7 +138,7 @@ class OPCN3(DataSource):
 
 
     def get_gatewaykey(self):
-        key_file = os.path.join(Path.cwd, self.gateway_key_file)
+        key_file = os.path.join(Path.cwd(), self.gateway_key_file)
         try:
             f = open(key_file)
             self.gateway_key = f.read()

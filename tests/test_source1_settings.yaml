@@ -1,7 +1,14 @@
-# note, must have space after colon before settings value
-GADGET_ID: TST_001
-GASCLOUD_KEY: DEMO
-UPLOAD_INTERVAL_SECS: 3600   # how often batches are uploaded
-LOGGING_INTERVAL_SECS: 300   # how often data is collected from the device
+API: https://thegascloud.com/api/v1
 DBNAME: ./test_readings.db
 DB_TABLE: Readings
+GASCLOUD_KEY: DEMO
+GADGET_ID: TST_001
+GADGET_TYPE: OPCN3
+UPLOAD_INTERVAL_SECS: 3600   # how often batches are uploaded
+LOGGING_INTERVAL_SECS: 300   # how often data is collected from the device
+BATCH_MODE: PASS
+BATCH_TYPE: OPC
+BATCH_DIR_PENDING: /home/pi/gascloud/batches2upload
+BATCH_DIR_UPLOADED: /home/pi/gascloud/batchesuploaded
+DELETE_BATCH_ON_UPLOAD: False
+DELETE_READING_ON_ZIP: False

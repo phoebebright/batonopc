@@ -78,3 +78,18 @@ class TestDataSource:
         json_json = json.loads(rec['raw_data'] )
         assert json_json[0]['1'] == 1
 
+    def test_get_gateway_key(self):
+
+        assert self.source.get_gatewaykey() == "11794317e05a4cb3befb"
+
+    def test_make_batch(self):
+
+        json_data = json.dumps([{'1': 1, '2': '2'}])
+        self.source.write_reading("TEST", temp=1.1, rh=2.2, raw_data=json_data)
+        json_data = json.dumps([{'1': 2, '2': '3'}])
+        self.source.write_reading("TEST", temp=1.2, rh=2.3, raw_data=json_data)
+
+        key = self.source.make_batch()
+
+        assert key == "11794317e05a4cb3befb"
+

@@ -118,7 +118,7 @@ class DataSource(ConnectDB):
 
 
         # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
-        self.gadget_id = self.settings['GADGET_ID']
+        # self.gadget_id = self.settings['GADGET_ID']
 
 
         # get full path of source_ref and make sure we have one, creating if necessary
@@ -175,7 +175,7 @@ class DataSource(ConnectDB):
 
 
     def get_gatewaykey(self):
-        key_file = os.path.join(Path.cwd, self.gateway_key_file)
+        key_file = os.path.join(Path.cwd(), self.gateway_key_file)
         try:
             f = open(key_file)
             self.gateway_key = f.read()
@@ -238,8 +238,8 @@ class DataSource(ConnectDB):
                 os.mkdir(self.settings['BATCH_DIR_PENDING'])
 
 
-            if self.settings['GADGET_ID'] > ' ':
-                gadget_id = self.settings['GADGET_ID']
+            # if self.settings['GADGET_ID'] > ' ':
+            #     gadget_id = self.settings['GADGET_ID']
 
             # check the gateway key is available - this is the key for the device that is uploading,
             # not the device that is generating the data - although in this instance they are the same thing.
@@ -471,8 +471,8 @@ class GasCloudInterface(ConnectDB):
         if not os.path.exists(self.settings['BATCH_DIR_UPLOADED']):
             os.mkdir(self.settings['BATCH_DIR_UPLOADED'])
 
-        if self.settings['GADGET_ID'] > ' ':
-            gadget_id = self.settings['GADGET_ID']
+        # if self.settings['GADGET_ID'] > ' ':
+        #     gadget_id = self.settings['GADGET_ID']
 
 
 
@@ -547,8 +547,8 @@ class GasCloudInterface(ConnectDB):
 
         # make quarantine request
 
-        if self.settings['GADGET_ID'] > ' ':
-            payload['gadget_id'] = self.settings['GADGET_ID']
+        # if self.settings['GADGET_ID'] > ' ':
+        #     payload['gadget_id'] = self.settings['GADGET_ID']
 
         headers = {f'Authorization': 'Bearer {self.gateway_key}'}
 

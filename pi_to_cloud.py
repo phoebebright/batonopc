@@ -9,7 +9,7 @@ def main():
     settings_file = os.path.join(Path.cwd(), "settings.yaml")
 
     pi = OPCN3(settings_file)
-    pi.create_readings_file()
+    pi.create_table_if_not_exists()
 
     #TODO: handle no readings file
 

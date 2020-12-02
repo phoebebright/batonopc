@@ -103,7 +103,7 @@ class ConnectDB():
 class DataSource(ConnectDB):
 
     source_ref_file = "source_ref.csv"
-
+    gateway_key_file = "gateway_key.txt"
     gadget_id = None
 
 

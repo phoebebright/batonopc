@@ -50,6 +50,8 @@ class OPCN3(DataSource):
 
         self.connect2db()
 
+        self.gateway_key = self.get_gatewaykey()
+
         try:
             self.partic = opc.OPCN3(spi)
         except Exception as e:

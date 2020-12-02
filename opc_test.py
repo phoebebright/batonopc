@@ -1,5 +1,3 @@
-# This simply starts up the OPC and then shuts down
-
 from usbiss.spi import SPI
 import opc
 

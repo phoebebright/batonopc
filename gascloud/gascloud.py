@@ -175,7 +175,7 @@ class DataSource(ConnectDB):
 
 
     def get_devicekey(self):
-        key_file = os.path.join(self.cwd, self.gateway_key_file)
+        key_file = os.path.join(Path.cwd, self.gateway_key_file)
         try:
             f = open(key_file)
             self.gateway_key = f.read()
@@ -184,7 +184,7 @@ class DataSource(ConnectDB):
             return None
 
         if len(self.gateway_key) != 20:
-            print("Invalid Device Key")
+            print("Invalid Gateway key")
             return None
 
         return self.gateway_key
@@ -241,17 +241,17 @@ class DataSource(ConnectDB):
             if self.settings['GADGET_ID'] > ' ':
                 gadget_id = self.settings['GADGET_ID']
 
-            # check the device key is available - this is the key for the device that is uploading,
+            # check the gateway key is available - this is the key for the device that is uploading,
             # not the device that is generating the data - although in this instance they are the same thing.
             #TODO: rename as gateway_key
-            device_key = self.get_devicekey()
+            gateway_key = self.get_devicekey()
 
 
             # create filename with date and load data from sqlite db
             when = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             last_write = self.get_last_source_ref()
             next_sequence = int(last_write['sequence'])+1
-            source_ref = "%s_%0.6d_%s" % (device_key, next_sequence, datetime.utcnow().strftime("%Y%m%d%H%M%S"))
+            source_ref = "%s_%0.6d_%s" % (gateway_key, next_sequence, datetime.utcnow().strftime("%Y%m%d%H%M%S"))
 
 
 
@@ -274,7 +274,7 @@ class DataSource(ConnectDB):
             filelist = [fname,yamlfile]
 
             # create yamlfile with details of our batch
-            self.make_yaml(yamlfile, self.settings['BATCH_TYPE'], self.settings['BATCH_MODE'], device_key, source_ref, when,  filelist, gadget_id=gadget_id, range_written=range_written)
+            self.make_yaml(yamlfile, self.settings['BATCH_TYPE'], self.settings['BATCH_MODE'], gateway_key, source_ref, when,  filelist, gadget_id=gadget_id, range_written=range_written)
 
             # create zipfile but use the source_ref, it will be renamed when we have a batchid
             tempzipname = os.path.join( self.settings['BATCH_DIR_PENDING'], "%s.zip" % source_ref)
@@ -283,7 +283,7 @@ class DataSource(ConnectDB):
 
             # make yaml file with details of batch
             payload = {
-                'key': device_key,
+                'key': gateway_key,
                 'source_ref': source_ref,
                 'filelist': "%s,%s" % (basename(filelist[0]), basename(filelist[1])),
                 'batch_type': self.settings['BATCH_TYPE'],
@@ -307,7 +307,7 @@ class DataSource(ConnectDB):
 
             logger.info("Created batch %s" % source_ref)
 
-            return device_key
+            return gateway_key
 
 
 
@@ -330,7 +330,7 @@ class GasCloudInterface(ConnectDB):
         :param settings_file: full path to settings.yaml if not using default
         :param source_ref_file: full path to source_ref.csv if not using default
 
-        NOTE: a device key will be needed to upload to TheGasCloud - you can get a pin from thegascloud.com
+        NOTE: a gateway key will be needed to upload to TheGasCloud - you can get a pin from thegascloud.com
         website, then run register.py, enter the pin when requested and new key will be retrieved from thegascloud.com.
         This steps requires internet access.
         '''
@@ -341,10 +341,10 @@ class GasCloudInterface(ConnectDB):
 
 
 
-        # check the device key is available - this is the key for the device that is uploading,
+        # check the gateway key is available - this is the key for the device that is uploading,
         # not the device that is generating the data - although in this instance they are the same thing.
 
-        self.device_key = self.get_devicekey()
+        self.gateway_key = self.get_gatewaykey()
 
 
         # self.db_name = self.settings['DBNAME']
@@ -355,8 +355,8 @@ class GasCloudInterface(ConnectDB):
         # self.create_table_if_not_exists()
 
 
-    def get_devicekey(self):
-        key_file = os.path.join(self.cwd, self.gateway_key_file)
+    def get_gatewaykey(self):
+        key_file = os.path.join(Path.cwd, self.gateway_key_file)
         try:
             f = open(key_file)
             self.gateway_key = f.read()
@@ -561,7 +561,7 @@ class GasCloudInterface(ConnectDB):
         else:
             raise ValueError(f"Quaratine request FAILED: {response.reason}")
 
-        # add device key - this can be removed when gascloud is updated to include this
+        # add gateway key - this can be removed when gascloud is updated to include this
         creds['destination'] += f"{self.gateway_key}/inbox/"
 
         # rename zipfile and payload yaml with batchid now we have it (we will have to name back again if upload fails)

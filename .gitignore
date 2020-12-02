@@ -6,7 +6,7 @@ nanostem_weather/settings.yaml
 batches2upload
 batchesuploaded
 
-device_key.txt
+gateway_key.txt
 source_ref.csv
 
 venv

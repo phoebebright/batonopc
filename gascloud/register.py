@@ -1,7 +1,7 @@
 '''
 to registr device with gascloud, enter pin.
-confirm pin is valid and will get device key in return
-use device key to make quarantine request
+confirm pin is valid and will get gateway key in return
+use gateway key to make quarantine request
 '''
 import requests
 import os
@@ -27,7 +27,7 @@ def getserial():
 
 
 def save_devicekey(key):
-    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../device_key.txt")
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../gateway_key.txt")
 
 
     with open(path, 'w+') as out_file:

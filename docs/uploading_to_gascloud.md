@@ -8,14 +8,13 @@ Uploading to gascloud
 Setup
 ------
 
-A device key is required to upload.  Get a pin number from the gascloud and run::
+A gateway key is required to upload.  Get a pin number from your gascloud online application and run::
 
     python3 gascloud/register.py
       
-Enter pin when requested.  This generates a device_key.txt file and the contents is used to upload.  Move the device_key.txt file into the root directory for the app. 
+Enter pin when requested.  This generates a gateway_key.txt file and the contents is used to upload.  Move the gateway_key.txt file into the root directory for the app. 
 
-
-Register the Pi on the Gadgets database (You will need Alphasense assistance with this) and add the id you receive as GADGET_ID in the settings. 
+Your devices will have been registered with the gascloud system (OPCN3, EDT) on the Gadgets database. Add the id you receive as GADGET_ID in the settings. 
 
 Check/create a settings.yaml, see example_settings.yaml for guidance.
 

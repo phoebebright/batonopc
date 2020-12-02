@@ -15,11 +15,16 @@ import hashlib
 from time import gmtime, strftime
 from pathlib import Path
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 # COPY OF CODE FROM gascloud_pi
 
 SETTINGS = "settings.yaml"
 
-VERSION = "1.2 Nov 2020"
+VERSION = "1.3 Dec 2020"
 
 
 class ConnectDB():
@@ -169,6 +174,22 @@ class DataSource(ConnectDB):
 
 
 
+    def get_devicekey(self):
+        key_file = os.path.join(self.cwd, self.gateway_key_file)
+        try:
+            f = open(key_file)
+            self.gateway_key = f.read()
+        except:
+            print('Gateway Key cannot be found')
+            return None
+
+        if len(self.gateway_key) != 20:
+            print("Invalid Device Key")
+            return None
+
+        return self.gateway_key
+
+
     def get_or_create_source_ref_file(self):
         '''convert filename to path and check file exists'''
 
@@ -208,7 +229,7 @@ class DataSource(ConnectDB):
 
 
     def make_batch(self):
-            '''take data from readings.csv and create a batch from them the clear down readings.csv'''
+            '''take data from readings datastore and create a batch from them and put in pending directory'''
 
             #TODO: check readings file exists and has more than 1 line
 
@@ -222,6 +243,7 @@ class DataSource(ConnectDB):
 
             # check the device key is available - this is the key for the device that is uploading,
             # not the device that is generating the data - although in this instance they are the same thing.
+            #TODO: rename as gateway_key
             device_key = self.get_devicekey()
 
 
@@ -234,8 +256,6 @@ class DataSource(ConnectDB):
 
 
             fname = os.path.join(self.settings['BATCH_DIR_PENDING'],"%s.csv" % source_ref)
-
-            #TODO: work without having to stop logging
 
             # move current readings file to pending directory and assuming method logging data will create a new readings file
             os.rename(self.readings_file_path, fname)
@@ -335,11 +355,6 @@ class GasCloudInterface(ConnectDB):
         # self.create_table_if_not_exists()
 
 
-
-
-
-
-
     def get_devicekey(self):
         key_file = os.path.join(self.cwd, self.gateway_key_file)
         try:
@@ -350,7 +365,7 @@ class GasCloudInterface(ConnectDB):
             return None
 
         if len(self.gateway_key) != 20:
-            print("Invalid Device Key")
+            print("Invalid Gateway Key")
             return None
 
         return self.gateway_key

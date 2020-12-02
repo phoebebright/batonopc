@@ -1,7 +1,7 @@
 # batonopc
 OPC in Baton
 
-IN DEVELOPMENT - Oct 2020
+IN DEVELOPMENT - Dec 2020
 
 Assumptions
 ------------
@@ -22,14 +22,7 @@ Collecting Data
 
     python3 log_data.py
     
-Data is logged to readings.csv 
-The csv file is a generic format:
-2 character record type
-integer seconds since start of file
-data values separated by comma
-
-The data values depend on the record type.
-The first record must be a 0 record type that says what time the data collection started at.
+Data is logged to an sqlite database
 
 
 Upload to Gascloud
@@ -39,7 +32,11 @@ See docs/uploading_to_gascloud.md to setup, then::
 
     python3 pi_to_cloud.py
 
-The data in readings.csv is used to create a new batch file 
+The data in database that has not yet been added to a batch is written out to a csv file, along with a meta data yaml file and then placed in a pending directory ready to upload to the cloud.
+
+
+
+
 
 
 

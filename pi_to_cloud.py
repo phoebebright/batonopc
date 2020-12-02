@@ -1,40 +1,17 @@
-from devices.ocpn3 import OPCN3
+from gascloud.gascloud import GasCloudInterface
 import time
 import os
 from pathlib import Path
+
 
 
 def main():
 
     settings_file = os.path.join(Path.cwd(), "settings.yaml")
 
-    pi = OPCN3(settings_file)
-    pi.create_table_if_not_exists()
-
-    #TODO: handle no readings file
-
-    # make batch from current readings.csv
-
-    starttime = time.time()
-    while True:
-        seconds = time.time() - starttime
-
-        # make batch of current data and put it in pending diretory
-        key = pi.make_batch()
-
-        # upload everything still in the pending directory
-        pi.upload_all()
-
-        print(f"uploading for {int(seconds)} seconds")
-        # time.sleep(10)
-
-
-
-
-
-
-
-
+    gc = GasCloudInterface(settings_file)
+    gc.upload.all()
+    print(f"uploading")
 
 
 if __name__ == '__main__':

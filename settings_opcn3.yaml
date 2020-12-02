@@ -5,3 +5,4 @@ UPLOAD_INTERVAL_SECS: 3600   # how often batches are uploaded
 LOGGING_INTERVAL_SECS: 10   # how often data is collected from the device
 DBNAME: ./test_readings.db
 DB_TABLE: Readings
+DATA_SOURCES: settings.yaml

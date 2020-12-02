@@ -585,7 +585,7 @@ class GasCloudInterface(ConnectDB):
             try:
                 scp.put(zipfile, creds['destination'], preserve_times=True)
             except Exception as e:
-                print("Error in scp to quarantine: %s" % e)
+                print("*** ERROR in scp to quarantine: %s" % e)
                 raise
 
     def batch_uploaded(self, batchid):

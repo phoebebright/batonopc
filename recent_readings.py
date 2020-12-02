@@ -7,7 +7,7 @@ from pathlib import Path
 
 def main():
 
-    settings_file = os.path.join(Path.cwd(), "settings.yaml")
+    settings_file = os.path.join(Path.cwd(), "settings_opcn3.yaml")
 
     readingsdb = DataSource(settings_file)
 

@@ -1,5 +1,7 @@
-from devices.ocpn3 import OPCN3
+# This seems to open a settings yaml file, retreive a list of datasources, then takes a reading from the gadget and write to a database
 
+from devices.ocpn3 import OPCN3
+from gascloud.gascloud import DataSource #BEN ADDED
 
 import time
 import csv
@@ -8,20 +10,18 @@ from pathlib import Path
 import yaml
 
 
-
-
 def main():
 
+    settings_file = os.path.join(Path.cwd(), "settings.yaml") # this simply builds the paths to the yaml file
 
-    settings_file = os.path.join(Path.cwd(), "settings.yaml")
     with open(settings_file) as file:
         settings = yaml.load(file, Loader=yaml.FullLoader)
 
     # setup each data source
     sources = []
-    for source in settings['DATA_SOURCES']:
-
-
+    for source in settings['DATA_SOURCES']: #an array of "data sources" expected to appear in DATA_SOURCES part of yaml with attribute 'settings'
+        # WHAT IS A DATA_SOURCE and how should this be constructed???
+        
         item = OPCN3(source['settings'])
         item.wake()
 
@@ -36,7 +36,7 @@ def main():
     done = False
     print("Logging started.  Press Ctrl-C to stop.")
     while not done:
-        for  source in sources:
+        for source in sources:
             try:
 
                 reading = source.get_particulates()
@@ -47,11 +47,14 @@ def main():
 
             except KeyboardInterrupt:
                 done = True
+                print("interuptted and Done")
                 source.sleep()
+                
 
             except Exception as e:
-                print(f"Error {e}")
+                print(f"*** ERROR {e}")
 
+        print("sleeping...")
         time.sleep(10)
 
 if __name__ == '__main__':

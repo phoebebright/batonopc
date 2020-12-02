@@ -26,7 +26,7 @@ def getserial():
 
 
 
-def save_devicekey(key):
+def save_gatewaykey(key):
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../gateway_key.txt")
 
 
@@ -47,9 +47,9 @@ response = requests.post(api, payload)
 
 if response.status_code == 200:
 
-    save_devicekey(response.content)
+    save_gatewaykey(response.content)
 
-    print("Device has been activated")
+    print("Gateway has been activated")
 
 
 else:

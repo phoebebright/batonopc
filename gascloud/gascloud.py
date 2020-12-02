@@ -174,7 +174,7 @@ class DataSource(ConnectDB):
 
 
 
-    def get_devicekey(self):
+    def get_gatewaykey(self):
         key_file = os.path.join(Path.cwd, self.gateway_key_file)
         try:
             f = open(key_file)
@@ -244,7 +244,7 @@ class DataSource(ConnectDB):
             # check the gateway key is available - this is the key for the device that is uploading,
             # not the device that is generating the data - although in this instance they are the same thing.
             #TODO: rename as gateway_key
-            gateway_key = self.get_devicekey()
+            gateway_key = self.get_gatewaykey()
 
 
             # create filename with date and load data from sqlite db

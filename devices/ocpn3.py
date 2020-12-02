@@ -8,6 +8,7 @@ import csv
 import os
 from os.path import basename
 import json
+from pathlib import Path
 
 # Open a SPI connection
 spi = SPI("/dev/ttyACM0")
@@ -134,3 +135,17 @@ class OPCN3(DataSource):
         return self.round_dict(readings)
 
 
+    def get_gatewaykey(self):
+        key_file = os.path.join(Path.cwd, self.gateway_key_file)
+        try:
+            f = open(key_file)
+            self.gateway_key = f.read()
+        except:
+            print('Gateway Key cannot be found')
+            return None
+
+        if len(self.gateway_key) != 20:
+            print("Invalid Gateway key")
+            return None
+
+        return self.gateway_key

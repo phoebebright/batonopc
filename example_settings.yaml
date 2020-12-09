@@ -1,6 +1,6 @@
 # note, must have space after colon before settings value
 API: https://thegascloud.com/api/v1
-DBNAME: ./test_readings.db
+DBNAME: /home/pi/batonopc/test_readings.db
 DB_TABLE: Readings
 GASCLOUD_KEY: DEMO
 GADGET_ID: TST_001
@@ -9,7 +9,7 @@ UPLOAD_INTERVAL_SECS: 3600   # how often batches are uploaded
 LOGGING_INTERVAL_SECS: 300   # how often data is collected from the device
 BATCH_MODE: PASS
 BATCH_TYPE: OPC
-BATCH_DIR_PENDING: /home/pi/gascloud/batches2upload
-BATCH_DIR_UPLOADED: /home/pi/gascloud/batchesuploaded
+BATCH_DIR_PENDING: /home/pi/batonopc/batches2upload
+BATCH_DIR_UPLOADED: /home/pi/batonopc/batchesuploaded
 DELETE_BATCH_ON_UPLOAD: False
 DELETE_READING_ON_ZIP: False

@@ -73,7 +73,7 @@ class OPCN3(DataSource):
                raw_data VARCHAR
                );
                '''
-        self.db.execute(sql)
+        self.commit_sql(sql)
 
     def write_reading(self, gadget_id, **readings):
 
@@ -91,7 +91,7 @@ class OPCN3(DataSource):
                  {readings['pm10']},
                  '{readings['raw_data']}')
                '''
-        self.db.execute(sql)
+        self.commit_sql(sql)
 
     def wake(self):
 

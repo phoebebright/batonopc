@@ -57,11 +57,8 @@ class ConnectDB():
 
     def read_settings(self, settings_file):
 
-        # assume if starts "/" then it is a full path, otherwise put current directory in front of it
-        # there is surely a safer way of doing this!
-        if not settings_file[0] == "/":
-
-            settings_file = os.path.join(Path.cwd(), settings_file)
+        # resolve relative path to full path
+        settings_file = os.path.abspath(settings_file)
 
         if not os.path.exists(settings_file):
             raise ValueError(f"Settings file {settings_file} not found")
@@ -72,11 +69,13 @@ class ConnectDB():
         return settings
 
     def connect2db(self):
-        self.db_name = self.settings['DBNAME']
+
+        self.db_name = os.path.abspath(self.settings['DBNAME'])
         self.db_table = self.settings['DB_TABLE']
 
         self.db = sqlite3.connect(self.db_name)
         self.db.row_factory = sqlite3.Row
+        print(f"Connected to db {self.settings['DBNAME']}")
 
         # create database and table if doesn't exist
         self.create_table_if_not_exists()
@@ -125,7 +124,7 @@ class DataSource(ConnectDB):
 
 
         # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
-        # self.gadget_id = self.settings['GADGET_ID']
+        self.gadget_id = self.settings['GADGET_ID']
 
 
         # get full path of source_ref and make sure we have one, creating if necessary
@@ -161,8 +160,30 @@ class DataSource(ConnectDB):
                 {readings['rh']},
                 '{readings['raw_data']}')
               '''
-        self.db.execute(sql)
+        self.commit_sql(sql)
 
+    def commit_sql(self, sql):
+
+        c = self.db.cursor()
+
+
+
+        # Execute SQL
+        try:
+            c.execute(sql)
+            print(f"SQL  : {sql}" )
+        except sqlite3.Error as error:
+            print(f"ERROR : DB FAILED to insert an entry : {error}")
+        except Exception as e:
+            print(f"EROR writing to DB: {e}")
+
+        # then commit
+        try:
+            self.db.commit()
+            # print("DB successfully commited a data entry insertion")
+
+        except sqlite3.Error as error:
+            print("ERROR : DB FAILED to commit a data entry insertion : ", error)
 
     def read_last(self, gadget_id):
         '''return a dictionary of the last reading or None if there is none'''
@@ -172,7 +193,7 @@ class DataSource(ConnectDB):
 
         data = result.fetchone()
         if data:
-            return dict(zip([c[0] for c in result.description], result.fetchone()))
+            return dict(zip([c[0] for c in result.description], data))
         else:
             return None
 

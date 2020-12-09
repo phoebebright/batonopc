@@ -14,6 +14,7 @@ import logging
 import hashlib
 from time import gmtime, strftime
 from pathlib import Path
+from contextlib import closing
 
 import logging
 
@@ -128,10 +129,6 @@ class DataSource(ConnectDB):
         self.gadget_id = self.settings['GADGET_ID']
 
 
-        # get full path of source_ref and make sure we have one, creating if necessary
-        if source_ref_file:
-            self.source_ref_file = source_ref_file
-        self.get_or_create_source_ref_file()
 
     def create_table_if_not_exists(self):
         '''this format is for testing - each source of data will have it's own format'''
@@ -255,25 +252,73 @@ class DataSource(ConnectDB):
 
 
 
-    def get_last_source_ref(self):
-        '''get next number in sequence and return between optional prefix and suffix'''
 
-        with open(self.source_ref_file, 'r') as csvfile:
-            reader = csv.DictReader(csvfile)
+class GasCloudInterface(ConnectDB):
+    '''handle interface and uploading of data to gascloud from any device
+    running python.  No UI'''
 
-            # to reduce memory usage (presumably) read each line to end of file to get last line
-            # rather than loading everything into memory
-            for row in reader:
-                lastrow = row
 
-        return lastrow
+    settings_file = "settings.yaml"
+    gateway_key_file = "gateway_key.txt"
+    batch_table = "Batches"
+    data_sources = []
 
-    def put_next_source_ref(self,*args):
-        '''get next number in sequence and return between optional prefix and suffix'''
 
-        with open(self.source_ref_file, 'a') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(args)
+
+    def __init__(self, settings=None, settings_file=None, source_ref_file=None):
+        '''
+
+        :param settings_file: full path to settings.yaml if not using default
+        :param source_ref_file: full path to source_ref.csv if not using default
+
+        NOTE: a gateway key will be needed to upload to TheGasCloud - you can get a pin from thegascloud.com
+        website, then run register.py, enter the pin when requested and new key will be retrieved from thegascloud.com.
+        This steps requires internet access.
+        '''
+
+        super().__init__(settings_file=None)
+
+
+        # check the gateway key is available - this is the key for the device that is uploading,
+        # not the device that is generating the data - although in this instance they are the same thing.
+
+        self.gateway_key = self.get_gatewaykey()
+
+        self.create_table_if_not_exists()
+
+
+    def get_gatewaykey(self):
+        key_file = os.path.abspath(self.gateway_key_file)
+        try:
+            f = open(key_file)
+            self.gateway_key = f.read()
+        except:
+            print('Gateway Key cannot be found')
+            return None
+
+        if len(self.gateway_key) != 20:
+            print("Invalid Gateway Key")
+            return None
+
+        return self.gateway_key
+
+
+    def create_table_if_not_exists(self):
+        '''this format is for testing - each source of data will have it's own format'''
+
+        sql = f'''
+              CREATE TABLE IF NOT EXISTS {self.batch_table} (
+              source_id integer PRIMARY KEY AUTOINCREMENT,
+              timestamp text NOT NULL,
+              gadget_id REAL,
+              reading_start REAL,
+              reading_end REAL,
+              batchid VARCHAR
+              );
+              '''
+        self.db.execute(sql)
+
+
 
     def make_batch(self):
             '''take data from readings datastore and create a batch from them and put in pending directory'''
@@ -285,14 +330,13 @@ class DataSource(ConnectDB):
                 os.mkdir(self.settings['BATCH_DIR_PENDING'])
 
 
-            # if self.settings['GADGET_ID'] > ' ':
-            #     gadget_id = self.settings['GADGET_ID']
-
             # check the gateway key is available - this is the key for the device that is uploading,
             # not the device that is generating the data - although in this instance they are the same thing.
-            #TODO: rename as gateway_key
+
             gateway_key = self.get_gatewaykey()
 
+            # get range of readings for this batch
+            first, last = self.get_reading_range()
 
             # create filename with date and load data from sqlite db
             when = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -358,64 +402,6 @@ class DataSource(ConnectDB):
 
 
 
-
-class GasCloudInterface(ConnectDB):
-    '''handle interface and uploading of data to gascloud from any device
-    running python.  No UI'''
-
-
-    settings_file = "settings.yaml"
-    gateway_key_file = "gateway_key.txt"
-
-    data_sources = []
-
-
-
-    def __init__(self, settings_file=None, source_ref_file=None):
-        '''
-
-        :param settings_file: full path to settings.yaml if not using default
-        :param source_ref_file: full path to source_ref.csv if not using default
-
-        NOTE: a gateway key will be needed to upload to TheGasCloud - you can get a pin from thegascloud.com
-        website, then run register.py, enter the pin when requested and new key will be retrieved from thegascloud.com.
-        This steps requires internet access.
-        '''
-
-        super().__init__(settings_file=None)
-
-
-
-
-
-        # check the gateway key is available - this is the key for the device that is uploading,
-        # not the device that is generating the data - although in this instance they are the same thing.
-
-        self.gateway_key = self.get_gatewaykey()
-
-
-        # self.db_name = self.settings['DBNAME']
-        # self.db_table = self.settings['DB_TABLE']
-        # # create database and table if doesn't exist
-        # self.db = sqlite3.connect(self.db_name)
-
-        # self.create_table_if_not_exists()
-
-
-    def get_gatewaykey(self):
-        key_file = os.path.join(Path.cwd, self.gateway_key_file)
-        try:
-            f = open(key_file)
-            self.gateway_key = f.read()
-        except:
-            print('Gateway Key cannot be found')
-            return None
-
-        if len(self.gateway_key) != 20:
-            print("Invalid Gateway Key")
-            return None
-
-        return self.gateway_key
 
     def make_yaml(self, yamlfile, batch_type, batch_mode, device_id, source_ref, when, filelist, gadget_id, range_written):
 
@@ -486,18 +472,33 @@ class GasCloudInterface(ConnectDB):
 
 
 
-    def get_last_source_ref(self):
-        '''get next number in sequence and return between optional prefix and suffix'''
+    def get_reading_range(self, overlap=0):
+        '''get range of readings to put in batch
+        start with the last reading in the last batch and finish with the latest reading
+         overlap allows for this many readings from the last batch to be included - useful when averaging'''
+        #TODO: add  WHERE gadget_id = '{gadget_id}'
 
-        with open(self.source_ref_file, 'r') as csvfile:
-            reader = csv.DictReader(csvfile)
+        first = None
+        last = None
 
-            # to reduce memory usage (presumably) read each line to end of file to get last line
-            # rather than loading everything into memory
-            for row in reader:
-                lastrow = row
+        # get last batch to find last reading sent
+        sql = f"SELECT * FROM {self.batch_table} ORDER BY timestamp DESC LIMIT 1"
+        c = self.db.execute(sql)
+        data = c.fetchone()
+        if data:
+            first = [dict(row) for row in c.fetchone()]
 
-        return lastrow
+        # get last reading to find max reading to send
+        with closing(sqlite3.connect(self.settings['DBNAME'])) as connection:
+            with closing(connection.cursor()) as cursor:
+                sql = f"SELECT * FROM {self.settings['DB_TABLE']} ORDER BY timestamp DESC LIMIT 1"
+                data = c.fetchone()
+                if data:
+                    last = [dict(row) for row in c.fetchone()]
+
+        #TODO: need to lock this so only have one batch being sent at a time
+
+        return first, last
 
     def put_next_source_ref(self,*args):
         '''get next number in sequence and return between optional prefix and suffix'''

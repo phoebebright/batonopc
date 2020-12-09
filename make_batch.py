@@ -1,4 +1,4 @@
-from devices.ocpn3 import OPCN3
+from gascloud.gascloud import GasCloudInterface
 import time
 import os
 from pathlib import Path
@@ -9,7 +9,7 @@ def main():
 
     settings_file = os.path.join(Path.cwd(), "settings.yaml")
 
-    pi = OPCN3(settings_file)
+    pi = GasCloudInterface(settings_file=settings_file)
 
     # make batch of current data and put it in pending diretory
     key = pi.make_batch()

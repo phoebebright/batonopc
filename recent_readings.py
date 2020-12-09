@@ -8,9 +8,9 @@ from pathlib import Path
 def main():
     '''display last 10 readings'''
 
-    settings_file = os.path.join(Path.cwd(), "settings.yaml")
+    settings_file = os.path.abspath("settings.yaml")
 
-    readingsdb = DataSource(settings_file)
+    readingsdb = DataSource(settings_file = settings_file)
 
     for item in readingsdb.get_recent_readings():
 

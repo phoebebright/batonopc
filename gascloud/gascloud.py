@@ -98,13 +98,14 @@ class ConnectDB():
             except Exception as e:
                 print("Exception in _query: %s" % e)
 
-    def get_recent_readings(self):
+    def get_recent_readings(self, limit=10):
 
-            sql = f"SELECT * FROM {self.db_table} ORDER BY timestamp DESC LIMIT 10"
+            sql = f"SELECT * FROM {self.db_table} ORDER BY timestamp DESC LIMIT {limit}"
 
             result = self.db.execute(sql)
 
-            return result.fetchall()
+            return [dict(row) for row in result.fetchall()]
+
 
 class DataSource(ConnectDB):
 
@@ -191,11 +192,8 @@ class DataSource(ConnectDB):
 
         result = self.db.execute(sql)
 
-        data = result.fetchone()
-        if data:
-            return dict(zip([c[0] for c in result.description], data))
-        else:
-            return None
+        return [dict(row) for row in result.fetchone()]
+
 
     def close_db(self):
 
@@ -257,6 +255,25 @@ class DataSource(ConnectDB):
 
 
 
+    def get_last_source_ref(self):
+        '''get next number in sequence and return between optional prefix and suffix'''
+
+        with open(self.source_ref_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+
+            # to reduce memory usage (presumably) read each line to end of file to get last line
+            # rather than loading everything into memory
+            for row in reader:
+                lastrow = row
+
+        return lastrow
+
+    def put_next_source_ref(self,*args):
+        '''get next number in sequence and return between optional prefix and suffix'''
+
+        with open(self.source_ref_file, 'a') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(args)
 
     def make_batch(self):
             '''take data from readings datastore and create a batch from them and put in pending directory'''

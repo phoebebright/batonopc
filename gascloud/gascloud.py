@@ -38,13 +38,20 @@ class ConnectDB():
     db = None
     connection = None
 
-    def __init__(self, settings_file=None):
+    def __init__(self, settings=None, settings_file=None):
+        '''pass either the settings as a dict or the settings_file '''
 
-        # assume settings file is in current directory
-        if not settings_file:
-            settings_file = self.settings_file
+        if settings:
+            self.settings = settings
+        else:
 
-        self.settings = self.read_settings(settings_file)
+            # assume settings file is in current directory
+            if not settings_file:
+                settings_file = self.settings_file
+
+
+            self.settings = self.read_settings(settings_file)
+
 
         self.connect2db()
 
@@ -108,13 +115,13 @@ class DataSource(ConnectDB):
 
 
 
-    def __init__(self, settings_file=None, source_ref_file=None):
+    def __init__(self, settings=None, settings_file=None, source_ref_file=None):
         '''
 
         :param settings_file: full path to device_settings.yaml if not using current path and/or default filename
 
         '''
-        super().__init__(settings_file)
+        super().__init__(settings, settings_file)
 
 
         # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
@@ -158,14 +165,16 @@ class DataSource(ConnectDB):
 
 
     def read_last(self, gadget_id):
-
+        '''return a dictionary of the last reading or None if there is none'''
         sql = f"SELECT * FROM {self.db_table} WHERE gadget_id = '{gadget_id}' ORDER BY timestamp DESC LIMIT 1"
 
         result = self.db.execute(sql)
 
-        rowDict = dict(zip([c[0] for c in result.description], result.fetchone()))
-
-        return rowDict
+        data = result.fetchone()
+        if data:
+            return dict(zip([c[0] for c in result.description], result.fetchone()))
+        else:
+            return None
 
     def close_db(self):
 

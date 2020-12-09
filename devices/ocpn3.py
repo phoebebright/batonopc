@@ -45,7 +45,7 @@ class OPCN3(DataSource):
 
 
 
-    def __init__(self, settings_file=None, source_ref_file=None):
+    def __init__(self, settings=None, settings_file=None, source_ref_file=None):
         super().__init__(settings_file, source_ref_file)
 
         self.connect2db()

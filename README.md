@@ -3,6 +3,8 @@ OPC in Baton
 
 IN DEVELOPMENT - Dec 2020
 
+This documentation is currently assuming the OPC3 is the only device being collected from.
+
 Assumptions
 ------------
 Time resolution is 1 second.  It is assumed that sub-second readings are not required.
@@ -28,7 +30,12 @@ Check there is a settings.yaml file and try:
 
     python3 read_once_opcn3.py
     
-Expecting to see a single reading displayed
+Expecting to see a single reading displayed, eg.
+
+logging None t:20.0, rh: 52.0, pms: 1.4, 2.6, 6.3
+    
+You may get a message: Gateway Key cannot be found
+The gateway key is requried when uploading to the cloud, but for now it can be ignored.
 
     
     
@@ -62,13 +69,25 @@ Upload to Gascloud
 Push any batches in batches2upload to the gascloud.
 
 
+Library Setup
+===============
+
+/devices
+Each new data source/device can be customised in terms of how data is collected and where it is written.  See opcn3.py 
+Each new device can be added to this directory.
+
+/gascloud
+Each device inherits from DataSource class in the gascloud directory which has methods for saving and uploading data.  
+
+example files are provided at the root level.  These can be used as a template of how to interact with the library.
+
 
 
 
 
 
 INFORMATION ONLY - Connecting a Raspberry Pi with OPC-N3 using USB on PyCharm - the journey
-------------------------------------------------
+===========
 
 The first challenge is there is not some out of the box code (that I can find Oct 2020) to do this.
 

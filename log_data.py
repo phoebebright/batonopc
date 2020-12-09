@@ -11,7 +11,7 @@ import yaml
 def main():
 
 
-    settings_file = os.path.join(Path.cwd(), "my_opc_settings.yaml")
+    settings_file = os.path.join(Path.cwd(), "example_settings.yaml")
     with open(settings_file) as file:
         settings = yaml.load(file, Loader=yaml.FullLoader)
 

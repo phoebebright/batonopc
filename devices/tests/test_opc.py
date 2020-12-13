@@ -1,4 +1,4 @@
-from gascloud.gascloud import GasCloudInterface as GasCloud, DataSource
+from gascloud.gascloud import Batcher as GasCloud, DataSource
 
 import os
 import json

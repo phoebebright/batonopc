@@ -1,6 +1,6 @@
 API: https://thegascloud.com/api/v1
-DBNAME: ./test_readings.db
-DB_TABLE: Readings
+DBNAME: default.db
+DB_TABLE: DefaultReadings
 GASCLOUD_KEY: DEMO
 GADGET_ID: TST_001
 GADGET_TYPE: OPCN3

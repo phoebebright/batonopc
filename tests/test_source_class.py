@@ -1,9 +1,14 @@
-from gascloud.gascloud import GasCloudInterface as GasCloud, DataSource
-
+from gascloud.gascloud import Batcher as GasCloud, DataSource
+import pytest
 import os
 import json
 from pathlib import Path
 
+TEST_SETTINGS = {
+    'DBNAME': './test_readings.db',
+    'DB_TABLE': 'Readings',
+    'GADGET_ID': 'TST_001',
+}
 
 class TestDataSource:
 
@@ -12,7 +17,7 @@ class TestDataSource:
 
     def setup_method(self):
         #':memory:'
-        self.source = DataSource("test_source1_settings.yaml")
+        self.source = DataSource(TEST_SETTINGS)
         self.source.connect2db()
 
     def teardown_method(self):
@@ -21,15 +26,46 @@ class TestDataSource:
 
     def test_setup(self):
         '''check settings have been read'''
-        assert self.source.settings['UPLOAD_INTERVAL_SECS'] == 3600
+        assert self.source.settings['GADGET_ID'] == TEST_SETTINGS['GADGET_ID']
         os.remove('./test_readings.db')
+
+    def test_pass_settings_as_dict(self):
+
+        settings = {'DBNAME': 'different_readings.db', 'DB_TABLE': 'OtherReadings', 'GADGET_ID': "OTHER"}
+        sauce = DataSource(settings)
+
+        assert sauce.settings['DBNAME'] == 'different_readings.db'
+        assert sauce.settings['DB_TABLE'] == 'OtherReadings'
+        assert sauce.settings['GADGET_ID'] == 'OTHER'
+
+    def test_settings_dict_overrides_files(self):
+
+        settings = {'DBNAME': 'different_readings.db', 'DB_TABLE': 'OtherReadings', 'GADGET_ID': "OTHER"}
+        sauce = DataSource(settings, settings_file="./test_settings/test_settings.yaml")
+
+        assert sauce.settings['DBNAME'] == 'different_readings.db'
+        assert sauce.settings['DB_TABLE'] == 'OtherReadings'
+        assert sauce.settings['GADGET_ID'] == 'OTHER'
+
+    def test_default_settings_file_used(self):
+
+        sauce = DataSource()
+
+        assert sauce.settings['DBNAME'] == 'default.db'
+        assert sauce.settings['DB_TABLE'] == 'DefaultReadings'
+
+    def test_missing_settings_file(self):
+
+        with pytest.raises(ValueError):
+            sauce = DataSource(settings_file="pepper.yaml")
+
 
     def test_create_db_if_not_exists(self):
 
         if os.path.exists('./test_readings.db'):
             os.remove('./test_readings.db')
 
-        new_source = DataSource("test_source1_settings.yaml")
+        new_source = DataSource(settings_file="test_settings/test_settings.yaml")
         new_source.connect2db()
 
         assert os.path.exists('./test_readings.db')
@@ -52,7 +88,7 @@ class TestDataSource:
 
         # now close and reopen and make sure it is the same file
 
-        new_source = DataSource("test_source1_settings.yaml")
+        new_source = DataSource(settings_file="test_settings/test_settings.yaml")
         new_source.connect2db()
 
         assert os.path.exists('./test_readings.db')
@@ -77,19 +113,4 @@ class TestDataSource:
 
         json_json = json.loads(rec['raw_data'] )
         assert json_json[0]['1'] == 1
-
-    def test_get_gateway_key(self):
-
-        assert self.source.get_gatewaykey() == "11794317e05a4cb3befb"
-
-    def test_make_batch(self):
-
-        json_data = json.dumps([{'1': 1, '2': '2'}])
-        self.source.write_reading("TEST", temp=1.1, rh=2.2, raw_data=json_data)
-        json_data = json.dumps([{'1': 2, '2': '3'}])
-        self.source.write_reading("TEST", temp=1.2, rh=2.3, raw_data=json_data)
-
-        key = self.source.make_batch()
-
-        assert key == "11794317e05a4cb3befb"
 

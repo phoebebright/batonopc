@@ -50,7 +50,7 @@ class OPCN3(DataSource):
 
         self.connect2db()
 
-        self.gateway_key = self.get_gatewaykey()
+        # self.gateway_key = self.get_gatewaykey()
 
         try:
             self.partic = opc.OPCN3(spi)
@@ -136,18 +136,3 @@ class OPCN3(DataSource):
 
         return self.round_dict(readings)
 
-
-    def get_gatewaykey(self):
-        key_file = os.path.join(Path.cwd(), self.gateway_key_file)
-        try:
-            f = open(key_file)
-            self.gateway_key = f.read()
-        except:
-            print('Gateway Key cannot be found')
-            return None
-
-        if len(self.gateway_key) != 20:
-            print("Invalid Gateway key")
-            return None
-
-        return self.gateway_key

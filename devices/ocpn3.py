@@ -1,14 +1,13 @@
 from tinycloud.tinycloud import DataSource
+from .opcn3_batcher import OPCN3_SaveMixin
 
 from usbiss.spi import SPI
 import opc
 
 from datetime import datetime
-import csv
-import os
-from os.path import basename
 import json
-from pathlib import Path
+
+
 
 # Open a SPI connection
 spi = SPI("/dev/ttyACM0")
@@ -36,13 +35,11 @@ logger.addHandler(handler)
 
 
 
-class OPCN3(DataSource):
-    ''''''
-
+class OPCN3(DataSource, OPCN3_SaveMixin):
+    '''Class to manage collection of data from the OPC and writing of data to database'''
 
 
     partic = None
-
 
 
     def __init__(self, settings=None, settings_file=None, source_ref_file=None):
@@ -57,42 +54,6 @@ class OPCN3(DataSource):
         except Exception as e:
             print("Startup Error: {}".format(e))
 
-    def create_table_if_not_exists(self):
-        '''this format is for testing - each source of data will have it's own format'''
-
-        sql = f'''
-               CREATE TABLE IF NOT EXISTS {self.db_table} (
-               rdg_no integer PRIMARY KEY AUTOINCREMENT,
-               timestamp text NOT NULL,
-               gadget_id REAL,
-               temp REAL,
-               rh REAL,
-               pm01 REAL,
-               pm25 REAL,
-               pm10 REAL,
-               raw_data VARCHAR
-               );
-               '''
-        self.commit_sql(sql)
-
-    def write_reading(self, gadget_id, **readings):
-
-        timestamp = datetime.now()
-
-        sql = f'''
-               INSERT INTO {self.db_table} 
-                 ('timestamp','gadget_id','temp','rh','pm01','pm25','pm10','raw_data')
-               VALUES ('{timestamp:%Y-%m-%d %H:%M}',
-                 '{gadget_id}', 
-                 {readings['temp']},
-                 {readings['rh']},
-                 {readings['pm01']},
-                 {readings['pm25']},
-                 {readings['pm10']},
-                 '{readings['raw_data']}')
-               '''
-        self.commit_sql(sql)
-
     def wake(self):
 
         # Turn on the OPC
@@ -102,9 +63,6 @@ class OPCN3(DataSource):
 
         # Turn off OPC
         self.partic.off()
-
-
-
 
     def round_dict(self, data, dp=1):
         '''round values in a dict - assumes all are numbers are round to same dp'''

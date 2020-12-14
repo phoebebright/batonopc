@@ -1,5 +1,5 @@
-from tinycloud.tinycloud import Batcher
-from devices.ocpn3 import OPCN3
+
+from devices.opcn3_batcher import  OPCN3Batcher
 
 import os
 
@@ -8,13 +8,13 @@ import os
 
 def main():
 
-    settings_file = os.path.abspath("./settings.yaml")
-    source = OPCN3(settings_file=settings_file)
-    pi = Batcher(settings_file=settings_file, datasource=source)
+    settings_file = os.path.abspath("settings.yaml")
+    pi = OPCN3Batcher(settings_file=settings_file)
 
-    # make batch of current data and put it in pending diretory
-    key = pi.make_batch()
-    print(f"Made batch to upload with batch id {key}")
+    #TODO: warn if no gateway key
+    # make batch of current data and put it in pending directory
+    batch_file = pi.make_batch()
+    print(f"Made batch to upload: {batch_file}")
 
 
 

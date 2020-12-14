@@ -37,7 +37,7 @@ def save_gatewaykey(key):
 
 pin = input("Enter pin: ")
 
-api = "https://thegascloud.com/api/v1/activate/"
+api = "https://tinycloud.purit.ie/api/v1/activate/"
 payload = {'device_id' : getserial(),
            'pin': pin,
            'name': "Raspberry pi"}

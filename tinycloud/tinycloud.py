@@ -139,7 +139,7 @@ class DataSource(ConnectDB):
         super().__init__(settings, settings_file)
 
 
-        # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
+        # TODO: handle missing gadget and might want to check this is a valid gadget in tinycloud
         self.gadget_id = self.settings['GADGET_ID']
         print(f"Data source gadget id {self.gadget_id}")
 
@@ -148,17 +148,27 @@ class DataSource(ConnectDB):
     def create_table_if_not_exists(self):
         '''this format is for testing - each source of data will have it's own format'''
 
-        sql = f'''
-              CREATE TABLE IF NOT EXISTS {self.db_table} (
-              rdg_no integer PRIMARY KEY AUTOINCREMENT,
-              timestamp text NOT NULL,
-              gadget_id REAL,
-              temp REAL,
-              rh REAL,
-              raw_data VARCHAR
-              );
-              '''
-        self.db.execute(sql)
+        # want to know if table is created, so check first
+        # get the count of tables with the name
+        c = self.db.cursor()
+        self.db.execute(f"SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{self.db_table}'")
+
+        # if the count is 1, then table exists
+        if c.fetchone()[0] == 1:
+            print(f'Table {self.db_table} exists.')
+
+        else:
+            sql = f'''
+                  CREATE TABLE IF NOT EXISTS {self.db_table} (
+                  rdg_no integer PRIMARY KEY AUTOINCREMENT,
+                  timestamp text NOT NULL,
+                  gadget_id REAL,
+                  temp REAL,
+                  rh REAL,
+                  raw_data VARCHAR
+                  );
+                  '''
+            self.db.execute(sql)
 
     def write_reading(self, gadget_id, **readings):
 
@@ -259,7 +269,7 @@ class DataSource(ConnectDB):
 
 
 class Batcher(ConnectDB):
-    '''handle interface and uploading of data to gascloud from any device
+    '''handle interface and uploading of data to tinycloud from any device
     running python.  No UI'''
 
 
@@ -592,7 +602,7 @@ class Batcher(ConnectDB):
         else:
             raise ValueError(f"Quaratine request FAILED: {response.reason}")
 
-        # add gateway key - this can be removed when gascloud is updated to include this
+        # add gateway key - this can be removed when tinycloud is updated to include this
         creds['destination'] += f"{self.gateway_key}/inbox/"
 
         # rename zipfile and payload yaml with batchid now we have it (we will have to name back again if upload fails)

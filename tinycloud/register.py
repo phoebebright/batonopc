@@ -1,5 +1,5 @@
 '''
-to registr device with gascloud, enter pin.
+to registr device with tinycloud, enter pin.
 confirm pin is valid and will get gateway key in return
 use gateway key to make quarantine request
 '''

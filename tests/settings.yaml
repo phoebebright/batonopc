@@ -8,7 +8,7 @@ UPLOAD_INTERVAL_SECS: 3600   # how often batches are uploaded
 LOGGING_INTERVAL_SECS: 300   # how often data is collected from the device
 BATCH_MODE: PASS
 BATCH_TYPE: OPC
-BATCH_DIR_PENDING: /home/pi/gascloud/batches2upload
-BATCH_DIR_UPLOADED: /home/pi/gascloud/batchesuploaded
+BATCH_DIR_PENDING: /home/pi/tinycloud/batches2upload
+BATCH_DIR_UPLOADED: /home/pi/tinycloud/batchesuploaded
 DELETE_BATCH_ON_UPLOAD: False
 DELETE_READING_ON_ZIP: False

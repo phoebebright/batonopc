@@ -1,4 +1,4 @@
-from gascloud.gascloud import Batcher
+from tinycloud.tinycloud import Batcher
 import time
 import os
 from pathlib import Path

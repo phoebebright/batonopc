@@ -10,6 +10,6 @@ numpy
 pyusbiss
 
 
-#git+https://gitlab.com/gascloud/gascloud_pi.git    # currently using gascloud module in this repo
+#git+https://gitlab.com/gascloud/gascloud_pi.git    # currently using tinycloud module in this repo
 git+https://github.com/lizcorson/py-opc@opc-n3
 

@@ -1,4 +1,4 @@
-from gascloud.gascloud import DataSource
+from tinycloud.tinycloud import DataSource
 
 import os
 

@@ -1,4 +1,4 @@
-from gascloud.gascloud import Batcher as GasCloud, DataSource
+from tinycloud.tinycloud import Batcher as GasCloud, DataSource
 
 import os
 import json

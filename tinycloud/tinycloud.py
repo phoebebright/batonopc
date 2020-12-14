@@ -182,7 +182,6 @@ class DataSource(ConnectDB):
         # want to know if table is created, so check first
         # get the count of tables with the name
         c = self.db.cursor()
-        self.db.execute(f"SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{self.db_table}'")
 
         sql = f'''
               CREATE TABLE IF NOT EXISTS {self.db_table} (

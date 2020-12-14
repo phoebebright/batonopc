@@ -28,7 +28,38 @@ SETTINGS = "settings.yaml"
 VERSION = "1.3 Dec 2020"
 
 
-class ConnectDB():
+class SettingsMixin():
+    settings_file = "settings.yaml"
+    settings = {}
+
+    def __init__(self, settings=None, settings_file=None):
+        '''pass either the settings as a dict or the settings_file '''
+
+        if settings:
+            self.settings = settings
+        else:
+
+            # assume settings file is in current directory
+            if not settings_file:
+                settings_file = self.settings_file
+
+            self.settings = self.read_settings(settings_file)
+
+    def read_settings(self, settings_file):
+
+        # resolve relative path to full path
+        settings_file = os.path.abspath(settings_file)
+
+        if not os.path.exists(settings_file):
+            raise ValueError(f"Settings file {settings_file} not found")
+
+        with open(settings_file) as file:
+            settings = yaml.load(file, Loader=yaml.FullLoader)
+
+        return settings
+
+
+class ConnectDB(SettingsMixin):
     '''simple class to connect and retrieve readings from database'''
 
     settings_file = "settings.yaml"
@@ -82,22 +113,20 @@ class ConnectDB():
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
-         raise NotImplemented("Create function in class that generates data")
+        raise NotImplemented("Create function in class that generates data")
 
 
     def get_recent_readings(self, limit=10):
 
-            sql = f"SELECT * FROM {self.db_table} ORDER BY rdg_no DESC LIMIT {limit}"
+        sql = f"SELECT * FROM {self.db_table} ORDER BY rdg_no DESC LIMIT {limit}"
 
-            result = self.db.execute(sql)
+        result = self.db.execute(sql)
 
-            return [dict(row) for row in result.fetchall()]
+        return [dict(row) for row in result.fetchall()]
 
     def commit_sql(self, sql):
 
         c = self.db.cursor()
-
-
 
         # Execute SQL
         try:
@@ -119,6 +148,8 @@ class ConnectDB():
 
     def close_db(self):
         self.db.close()
+
+
 
 
 
@@ -199,11 +230,6 @@ class DataSource(ConnectDB):
             return None
 
 
-
-
-
-
-
     def get_or_create_source_ref_file(self):
         '''convert filename to path and check file exists'''
 
@@ -239,51 +265,27 @@ class DataSource(ConnectDB):
             os.remove(self.readings_file_path)
             self.readings_file_path = None
 
-    def get_reading_range(self, overlap=0):
-        '''get range of readings to put in batch
-        start with the last reading in the last batch and finish with the latest reading
-         overlap allows for this many readings from the last batch to be included - useful when averaging'''
-        #TODO: add  WHERE gadget_id = '{gadget_id}'
 
-        first = None
-        last = None
-
-        # get last batch to find last reading sent
-        sql = f"SELECT * FROM {self.batch_table} ORDER BY rdg_no DESC LIMIT 1"
-        c = self.db.execute(sql)
-        data = c.fetchone()
-        if data:
-            first = [dict(row) for row in c.fetchone()]
-
-        # get last reading to find max reading to send
-        with closing(sqlite3.connect(self.settings['DBNAME'])) as connection:
-            with closing(connection.cursor()) as cursor:
-                sql = f"SELECT * FROM {self.settings['DB_TABLE']} ORDER BY rdg_no DESC LIMIT 1"
-                data = c.fetchone()
-                if data:
-                    last = [dict(row) for row in c.fetchone()]
-
-        #TODO: need to lock this so only have one batch being sent at a time
-
-        return first, last
-
-
-class Batcher(ConnectDB):
+class Batcher(SettingsMixin):
     '''handle interface and uploading of data to tinycloud from any device
     running python.  No UI'''
 
 
-    settings_file = "settings.yaml"
+
     gateway_key_file = "gateway_key.txt"
     batch_table = "Batches"
-    datasource = None
+    gadget_id = None
+
+    db_batch_name = None
+    db_batch_table = None
+    db_headings = []
+    db_batch = None
+    batch_connection = None
 
 
-
-    def __init__(self, datasource, settings=None, settings_file=None):
+    def __init__(self, settings=None, settings_file=None):
         '''
 
-        :param datasource: class for the data to be batched
         :param settings: pass in settings in a dict - see example_settings.yaml
         :param settings_file: full path to settings.yaml if not using default
 
@@ -305,7 +307,8 @@ class Batcher(ConnectDB):
         self.gateway_key = self.get_gatewaykey()
 
         # keep a record of batches in an sqlite table
-        self.create_table_if_not_exists()
+        self.connect2batchdb()
+        self.create_batch_table_if_not_exists()
 
 
     def get_gatewaykey(self):
@@ -323,8 +326,20 @@ class Batcher(ConnectDB):
 
         return self.gateway_key
 
+    def connect2batchdb(self):
 
-    def create_table_if_not_exists(self):
+        self.db_batch_name = os.path.abspath(self.settings['BATCH_DBNAME'])
+        self.db_batch_table = self.settings['BATCH_TABLE']
+        print(f"Connecting to {self.db_batch_name}...")
+
+        self.db_batch = sqlite3.connect(self.db_batch_name)
+        self.db_batch.row_factory = sqlite3.Row
+        print(f"Connected to db {os.path.abspath(self.settings['BATCH_DBNAME'])} using table {self.settings['BATCH_TABLE']}")
+
+        # create database and table if doesn't exist
+        self.create_batch_table_if_not_exists()
+
+    def create_batch_table_if_not_exists(self):
         '''this format is for testing - each source of data will have it's own format'''
 
         sql = f'''
@@ -334,93 +349,155 @@ class Batcher(ConnectDB):
               gadget_id REAL,
               reading_start REAL,
               reading_end REAL,
-              batchid VARCHAR
+              batchid VARCHAR 
               );
               '''
         self.db.execute(sql)
 
 
+    def get_reading_range(self, overlap=0):
+        '''get range of readings to put in batch
+        start with the last reading in the last batch and finish with the latest reading
+         overlap allows for this many readings from the last batch to be included - useful when averaging'''
+        #TODO: add  WHERE gadget_id = '{gadget_id}'
+
+        first = None
+        last = None
+
+        # get last batch to find last reading sent
+        sql = f"SELECT reading_end FROM {self.batch_table} ORDER BY reading_end DESC LIMIT 1"
+        c = self.db_batch.execute(sql)
+        data = c.fetchone()
+        if data:
+            first = dict(data)['reading_end']
+        else:
+            first = 0
+
+        # get last reading to find max reading to send
+        sql = f"SELECT * FROM {self.settings['DB_TABLE']} ORDER BY rdg_no DESC LIMIT 1"
+        c = self.db.execute(sql)
+        data = c.fetchone()
+        if data:
+            last = dict(data)['rdg_no']
+        else:
+            #TODO: handle empty
+            last = None
+
+        #TODO: need to lock this so only have one batch being sent at a time
+
+        return first, last
+
 
     def make_batch(self):
-            '''take data from readings datastore and create a batch from them and put in pending directory'''
+        '''take data from readings datastore and create a batch from them and put in pending directory'''
 
-            #TODO: check readings file exists and has more than 1 line
-
-
-            if not os.path.exists(self.settings['BATCH_DIR_PENDING']):
-                os.mkdir(self.settings['BATCH_DIR_PENDING'])
+        #TODO: check readings file exists and has more than 1 line
 
 
-            # check the gateway key is available - this is the key for the device that is uploading,
-            # not the device that is generating the data - although in this instance they are the same thing.
-
-            gateway_key = self.get_gatewaykey()
-
-            # get range of readings for this batch
-            first, last = self.datasource.get_reading_range()
-
-            # create filename with date and load data from sqlite db
-            when = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            last_write = self.get_last_source_ref()
-            next_sequence = int(last_write['sequence'])+1
-            source_ref = "%s_%0.6d_%s" % (gateway_key, next_sequence, datetime.utcnow().strftime("%Y%m%d%H%M%S"))
+        if not os.path.exists(self.settings['BATCH_DIR_PENDING']):
+            os.mkdir(self.settings['BATCH_DIR_PENDING'])
 
 
+        # check the gateway key is available - this is the key for the device that is uploading,
+        # not the device that is generating the data - although in this instance they are the same thing.
 
-            fname = os.path.join(self.settings['BATCH_DIR_PENDING'],"%s.csv" % source_ref)
+        gateway_key = self.get_gatewaykey()
 
-            # move current readings file to pending directory and assuming method logging data will create a new readings file
-            os.rename(self.readings_file_path, fname)
+        # get range of readings for this batch
+        first, last = self.get_reading_range()
 
-            #TODO: put something useful in range_written
-            range_written = [0,1]
-            # if no data, then nothing to do - might want to make a setting so downloads anyway
-            # if not range_written[0]:
-            #     print("No data to download")
-            #     return
+        # handle nothing to do
+        if not last:
+            print("Nothing to write")
+            return
 
-            # name of yamlfile to go with it
-            yamlfile = os.path.join(self.settings['BATCH_DIR_PENDING'], "%s.yaml" % source_ref)
-
-            # names of files we are going to upload
-            filelist = [fname,yamlfile]
-
-            # create yamlfile with details of our batch
-            self.make_yaml(yamlfile, self.settings['BATCH_TYPE'], self.settings['BATCH_MODE'], gateway_key, source_ref, when,  filelist, gadget_id=gadget_id, range_written=range_written)
-
-            # create zipfile but use the source_ref, it will be renamed when we have a batchid
-            tempzipname = os.path.join( self.settings['BATCH_DIR_PENDING'], "%s.zip" % source_ref)
-
-            zip_size, zip_md5 = self.make_zipfile(tempzipname, filelist)
-
-            # make yaml file with details of batch
-            payload = {
-                'key': gateway_key,
-                'source_ref': source_ref,
-                'filelist': "%s,%s" % (basename(filelist[0]), basename(filelist[1])),
-                'batch_type': self.settings['BATCH_TYPE'],
-                'batch_mode': self.settings['BATCH_MODE'],
-                'zip_size': zip_size,
-                'zip_md5': zip_md5,
-
-            }
-            payload_yaml_name = os.path.join(self.settings['BATCH_DIR_PENDING'], "%s.yaml" % source_ref)
-            self.make_payload_yaml(payload_yaml_name, payload)
-
-            self.put_next_source_ref(next_sequence, source_ref, zip_size, zip_md5, datetime.utcnow().isoformat())
-
-            # now delete readings so don't get duplicates
-            # delete readings now we have the zipfile
-
-            if self.settings['DELETE_READING_ON_ZIP']:
-                logger.info("Deleting readings between %s and %s" % (range_written[0], range_written[1]))
-                self.delete_readings_from_db(self.settings['DBNAME'], range_written[0], range_written[1])
+        batch = self.create_batch_record(first, last)
 
 
-            logger.info("Created batch %s" % source_ref)
+        source_ref = f"{batch['timestamp']}_{batch['source_id']}"
+        fname = os.path.join(self.settings['BATCH_DIR_PENDING'],f"{source_ref}.csv")
 
-            return gateway_key
+        # create a csvfile of readings
+        firstrow, lastrow = self.make_csvfile(fname, first, last)
 
+        # name of yamlfile to go with it
+        yamlfile = os.path.join(self.settings['BATCH_DIR_PENDING'], "%s.yaml" % source_ref)
+
+        # names of files we are going to upload
+        filelist = [fname,yamlfile]
+
+        # create yamlfile with details of our batch
+        self.make_yaml(yamlfile, self.settings['BATCH_TYPE'], self.settings['BATCH_MODE'], gateway_key, source_ref, batch['timestamp'],  filelist, gadget_id=self.gadget_id, range_written=[firstrow, lastrow])
+
+        # create zipfile but use the source_ref, it will be renamed when we have a batchid
+        tempzipname = os.path.join( self.settings['BATCH_DIR_PENDING'], "%s.zip" % source_ref)
+
+        zip_size, zip_md5 = self.make_zipfile(tempzipname, filelist)
+
+        # make yaml file with details of batch
+        payload = {
+            'key': gateway_key,
+            'source_ref': source_ref,
+            'filelist': "%s,%s" % (basename(filelist[0]), basename(filelist[1])),
+            'batch_type': self.settings['BATCH_TYPE'],
+            'batch_mode': self.settings['BATCH_MODE'],
+            'zip_size': zip_size,
+            'zip_md5': zip_md5,
+
+        }
+        payload_yaml_name = os.path.join(self.settings['BATCH_DIR_PENDING'], "%s.yaml" % source_ref)
+        self.make_payload_yaml(payload_yaml_name, payload)
+
+
+        # now delete readings so don't get duplicates
+        # delete readings now we have the zipfile
+
+        # if self.settings['DELETE_READING_ON_ZIP']:
+        #     logger.info("Deleting readings between %s and %s" % (range_written[0], range_written[1]))
+        #     self.delete_readings_from_db(self.settings['DBNAME'], range_written[0], range_written[1])
+
+
+        logger.info("Created batch %s" % source_ref)
+
+        return fname
+
+    def create_batch_record(self, first, last):
+
+        timestamp = datetime.now()
+
+        sql = f'''
+              INSERT INTO {self.db_batch_table} 
+                ('timestamp','gadget_id','reading_start','reading_end','batchid')
+              VALUES ('{timestamp:%Y-%m-%d_%H:%M}',
+                '{self.gadget_id}',
+                {first},
+                {last},
+                'pending')
+              '''
+
+        c = self.db_batch.cursor()
+
+        # Execute SQL
+        try:
+            c.execute(sql)
+            print(f"SQL  : {sql}" )
+        except sqlite3.Error as error:
+            print(f"ERROR : DB FAILED to insert an entry : {error}")
+        except Exception as e:
+            print(f"EROR writing to DB: {e}")
+
+        # then commit
+        try:
+            self.db_batch.commit()
+            # print("DB successfully commited a data entry insertion")
+
+        except sqlite3.Error as error:
+            print("ERROR : DB FAILED to commit a data entry insertion : ", error)
+
+        if c.lastrowid:
+            sql = f"SELECT * FROM  {self.db_batch_table} WHERE source_id =  {c.lastrowid}"
+            result = self.db_batch.execute(sql)
+            return dict(result.fetchone())
 
     def make_yaml(self, yamlfile, batch_type, batch_mode, device_id, source_ref, when, filelist, gadget_id, range_written):
 
@@ -467,25 +544,24 @@ class Batcher(ConnectDB):
 
         return os.path.getsize(zipfname), m.hexdigest()
 
-    def make_csvfile(self, fname):
-
-        lastrow = None
-        firstrow = None
+    def make_csvfile(self, fname, first, last):
 
         # get data to upload
-        with sqlite3.connect(self.db_name) as connection:
 
-            csvWriter = csv.writer(open(fname, "w+"))
-            c = connection.cursor()
-            csvWriter.writerow(self.db_headings)
+        firstrow = None
+        lastrow = None
+
+        csvWriter = csv.writer(open(fname, "w+"))
+        c = self.db.cursor()
+        csvWriter.writerow(self.db_headings)
 
 
-            for row in c.execute(f"SELECT * FROM {self.db_table}"):
-                if not firstrow:
-                    firstrow = row[0]
-                # use the cursor as an iterable
-                csvWriter.writerow(row)
-                lastrow = row[0]
+        for row in c.execute(f"SELECT * FROM {self.db_table}"):
+            if not firstrow:
+                firstrow = row[0]
+            # use the cursor as an iterable
+            csvWriter.writerow(row)
+            lastrow = row[0]
 
         return firstrow, lastrow
 

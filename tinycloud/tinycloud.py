@@ -154,7 +154,7 @@ class DataSource(ConnectDB):
         self.db.execute(f"SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{self.db_table}'")
 
         # if the count is 1, then table exists
-        if c.fetchone()[0] == 1:
+        if c.fetchone():
             print(f'Table {self.db_table} exists.')
 
         else:

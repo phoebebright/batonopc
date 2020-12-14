@@ -1,5 +1,5 @@
 # note, must have space after colon before settings value
-API: https://thegascloud.com/api/v1
+API: https://tinycloud.purit.ie/api/v1
 DBNAME: /home/pi/batonopc/test_readings.db
 DB_TABLE: Readings
 GASCLOUD_KEY: DEMO

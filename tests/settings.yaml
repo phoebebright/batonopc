@@ -1,4 +1,4 @@
-API: https://thegascloud.com/api/v1
+API: https://tinycloud.purit.ie/api/v1
 DBNAME: default.db
 DB_TABLE: DefaultReadings
 GASCLOUD_KEY: DEMO

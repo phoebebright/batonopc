@@ -1,9 +1,6 @@
 from gascloud.gascloud import DataSource
 
-import time
 import os
-from pathlib import Path
-
 
 def main():
     '''display last 10 readings'''

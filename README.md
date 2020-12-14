@@ -3,10 +3,12 @@ OPC in Baton
 
 IN DEVELOPMENT - Dec 2020
 
-This documentation is currently assuming the OPC3 is the only device being collected from.
+
 
 Assumptions
 ------------
+This documentation is currently assuming the OPC3 is the only device being collected from.
+
 Time resolution is 1 second.  It is assumed that sub-second readings are not required.
 
 Getting started
@@ -24,7 +26,7 @@ Connect OPCN3 to power and via USB to the pi
 
     python3 opc_test.py
 
-Expecting to hear fan start or change note, output displayed and fan stop.
+Expecting to hear fan start or change note, output displayed and fan stops.
 
 Check there is a settings.yaml file and try:
 
@@ -41,6 +43,7 @@ The gateway key is requried when uploading to the cloud, but for now it can be i
     
 Collecting Data
 ----------------
+To create a database and start logging::
 
     python3 log_data.py
     
@@ -61,12 +64,15 @@ Make a batch of data for Gascloud
 Creates a directory batches2upload and puts a zip file containing data ready to upload.
 
 
+
 Upload to Gascloud
 -------------------
 
     python3 pi_to_cloud.py
 
-Push any batches in batches2upload to the gascloud.
+Push any batches in batches2upload to the cloud.  Must have registered the pi as a gateway device with tinycloud and being using a valid gadget_id.
+
+
 
 
 Library Setup

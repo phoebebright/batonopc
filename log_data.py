@@ -1,21 +1,14 @@
 from devices.ocpn3 import OPCN3
 
 import time
-import csv
-import os
-from pathlib import Path
-import yaml
+
 
 
 
 def main():
 
 
-    settings_file = os.path.join(Path.cwd(), "example_settings.yaml")
-    with open(settings_file) as file:
-        settings = yaml.load(file, Loader=yaml.FullLoader)
-
-    item = OPCN3(settings)
+    item = OPCN3(settings_file="./settings.yaml")
     item.wake()
 
     starttime = time.time()

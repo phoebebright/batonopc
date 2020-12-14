@@ -76,7 +76,7 @@ class ConnectDB():
 
         self.db = sqlite3.connect(self.db_name)
         self.db.row_factory = sqlite3.Row
-        print(f"Connected to db {self.settings['DBNAME']}")
+        print(f"Connected to db {os.path.abspath(self.settings['DBNAME'])} using table {self.settings['DB_TABLE']}")
 
         # create database and table if doesn't exist
         self.create_table_if_not_exists()
@@ -141,6 +141,7 @@ class DataSource(ConnectDB):
 
         # TODO: handle missing gadget and might want to check this is a valid gadget in gascloud
         self.gadget_id = self.settings['GADGET_ID']
+        print(f"Data source gadget id {self.gadget_id}")
 
 
 

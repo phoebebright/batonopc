@@ -1,20 +1,16 @@
 from devices.ocpn3 import OPCN3  # import class for data source
 
 import time
-import csv
-import os
-from pathlib import Path
-import yaml
+
 
 
 
 def main():
 
-   # open my custom settings file for this particular OPCN3
-   settings_file = os.path.join(Path.cwd(), "example_settings.yaml")
+
 
    # instantiate the class with these settings and wake up the device
-   item = OPCN3(settings_file)
+   item = OPCN3(settings_file="./settings.yaml")
    item.wake()
 
    # give OPC a chance to collect some data

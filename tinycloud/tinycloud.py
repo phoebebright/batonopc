@@ -184,22 +184,17 @@ class DataSource(ConnectDB):
         c = self.db.cursor()
         self.db.execute(f"SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{self.db_table}'")
 
-        # if the count is 1, then table exists
-        if c.fetchone()[0] == 1:
-            print(f'Table {self.db_table} exists.')
-
-        else:
-            sql = f'''
-                  CREATE TABLE IF NOT EXISTS {self.db_table} (
-                  rdg_no integer PRIMARY KEY AUTOINCREMENT,
-                  timestamp text NOT NULL,
-                  gadget_id REAL,
-                  temp REAL,
-                  rh REAL,
-                  raw_data VARCHAR
-                  );
-                  '''
-            self.db.execute(sql)
+        sql = f'''
+              CREATE TABLE IF NOT EXISTS {self.db_table} (
+              rdg_no integer PRIMARY KEY AUTOINCREMENT,
+              timestamp text NOT NULL,
+              gadget_id REAL,
+              temp REAL,
+              rh REAL,
+              raw_data VARCHAR
+              );
+              '''
+        self.db.execute(sql)
 
     def write_reading(self, gadget_id, **readings):
 

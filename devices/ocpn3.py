@@ -35,7 +35,7 @@ logger.addHandler(handler)
 
 
 
-class OPCN3(DataSource, OPCN3_SaveMixin):
+class OPCN3(DataSource):
     '''Class to manage collection of data from the OPC and writing of data to database'''
 
 

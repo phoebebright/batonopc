@@ -1,6 +1,7 @@
 import os
 import sys
 
+# get the full path to the folder one level above where the current file
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_PATH)
 

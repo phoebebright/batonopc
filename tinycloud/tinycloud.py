@@ -131,7 +131,7 @@ class ConnectDB(SettingsMixin):
         # Execute SQL
         try:
             c.execute(sql)
-            print(f"SQL  : {sql}" )
+            #print(f"SQL  : {sql}" )
         except sqlite3.Error as error:
             print(f"ERROR : DB FAILED to insert an entry : {error}")
         except Exception as e:
@@ -474,7 +474,7 @@ class Batcher(SettingsMixin):
         # Execute SQL
         try:
             c.execute(sql)
-            print(f"SQL  : {sql}" )
+            # print(f"SQL  : {sql}" )
         except sqlite3.Error as error:
             print(f"ERROR : DB FAILED to insert an entry : {error}")
         except Exception as e:

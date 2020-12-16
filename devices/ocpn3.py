@@ -1,4 +1,10 @@
-from tinycloud.tinycloud import DataSource
+import os
+import sys
+
+BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_PATH)
+
+from tinycloud.tinycloud import DataSource # batonopc
 from .opcn3_batcher import OPCN3_SaveMixin
 
 from usbiss.spi import SPI

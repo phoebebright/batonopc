@@ -1,15 +1,19 @@
 # batonopc
-OPC in Baton
+This is a code library to assist in collecting data from the Alphasense OPCN3 and pushing it to a cloud for processing.  
 
-IN DEVELOPMENT - Dec 2020
+The generic code is in the tinycloud directory and code specific to the OPC is int he devices directory.  This code is split into the opcn3.py - for reading data and storing it to a database and opcn3_batcher for batching up the data in the database and sending it to the cloud.
 
+There are examples of how to use the code in .py files at the root level and these are listed in getting started below.
 
 
 Assumptions
 ------------
-This documentation is currently assuming the OPC3 is the only device being collected from.
+This documentation is currently assuming the OPC3 is the only device being collected from but the code has been structured in a way that adding additional devices should not be hard.
 
 Time resolution is 1 second.  It is assumed that sub-second readings are not required.
+
+The library is currently setup to write data to https://tinycloud.purit.ie  - a login and device key is required to do this.
+
 
 Getting started
 ---------------
@@ -56,7 +60,7 @@ Get latest reading from the database
     
 Display 10 recent readings
 
-Make a batch of data for Gascloud
+Make a batch of data for Tinycloud
 -------------------------
 
     python3 make_batch.py
@@ -65,7 +69,7 @@ Creates a directory batches2upload and puts a zip file containing data ready to 
 
 
 
-Upload to Gascloud
+Upload to Tinycloud
 -------------------
 
     python3 pi_to_cloud.py

@@ -22,4 +22,8 @@ Start an SSH Session
 
     Tools > Start ssh session
     
-   
+To sync
+
+    Right click batonpc (root folder)
+    Deployment...
+    Upload to root.... (first option)

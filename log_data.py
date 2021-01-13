@@ -24,7 +24,7 @@ def main():
             reading = item.get_particulates()
             item.write_reading(item.gadget_id, **reading)
 
-            print(f"logging {item.gadget_id} t:{reading['temp']}, rh: {reading['rh']}, pms: {reading['pm01']}, {reading['pm25']}, {reading['pm10']}")
+            print(f"logging {item.gadget_id} t:{reading['temp']}, rh: {reading['rh']}, pms: {reading['pm_01']}, {reading['pm_25']}, {reading['pm_10']}")
 
 
         except KeyboardInterrupt:
@@ -34,7 +34,7 @@ def main():
         except Exception as e:
             print(f"Error {e}")
 
-        time.sleep(10)
+        time.sleep(item.settings['LOGGING_INTERVAL_SECS'])
 
 if __name__ == '__main__':
     main()

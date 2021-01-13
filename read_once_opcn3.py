@@ -19,7 +19,7 @@ def main():
    # get the readings
    reading = item.get_particulates()
 
-   print(f"logging {item.gadget_id} t:{reading['temp']}, rh: {reading['rh']}, pms: {reading['pm01']}, {reading['pm25']}, {reading['pm10']}")
+   print(f"logging {item.gadget_id} t:{reading['temp']}, rh: {reading['rh']}, pms: {reading['pm_01']}, {reading['pm_25']}, {reading['pm_10']}")
 
 
 if __name__ == '__main__':

@@ -31,9 +31,9 @@ class OPCN3_SaveMixin(DataSource):
                gadget_id REAL,
                temp REAL,
                rh REAL,
-               pm01 REAL,
-               pm25 REAL,
-               pm10 REAL,
+               pm_01 REAL,
+               pm_25 REAL,
+               pm_10 REAL,
                raw_data VARCHAR
                );
                '''
@@ -45,14 +45,14 @@ class OPCN3_SaveMixin(DataSource):
 
         sql = f'''
                INSERT INTO {self.db_table} 
-                 ('timestamp','gadget_id','temp','rh','pm01','pm25','pm10','raw_data')
+                 ('timestamp','gadget_id','temp','rh','pm_01','pm_25','pm_10','raw_data')
                VALUES ('{timestamp:%Y-%m-%d %H:%M}',
                  '{gadget_id}', 
                  {readings['temp']},
                  {readings['rh']},
-                 {readings['pm01']},
-                 {readings['pm25']},
-                 {readings['pm10']},
+                 {readings['pm_01']},
+                 {readings['pm_25']},
+                 {readings['pm_10']},
                  '{readings['raw_data']}')
                '''
         self.commit_sql(sql)

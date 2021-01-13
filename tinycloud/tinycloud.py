@@ -184,15 +184,56 @@ class DataSource(ConnectDB):
         c = self.db.cursor()
 
         sql = f'''
-              CREATE TABLE IF NOT EXISTS {self.db_table} (
-              rdg_no integer PRIMARY KEY AUTOINCREMENT,
-              timestamp text NOT NULL,
-              gadget_id REAL,
-              temp REAL,
-              rh REAL,
-              raw_data VARCHAR
-              );
+            CREATE TABLE IF NOT EXISTS {self.db_table} (
+            rdg_no integer PRIMARY KEY AUTOINCREMENT,
+            timestamp text NOT NULL,
+            gadget_id VARCHAR,
+            temp REAL,
+            rh REAL,
+            pm_01 REAL,
+            pm_25 REAL,
+            pm_10 REAL,
+            bin_0 REAL,
+            bin_1 REAL,
+            bin_2 REAL,
+            bin_3 REAL,
+            bin_4 REAL,
+            bin_5 REAL,
+            bin_6 REAL,
+            bin_7 REAL,
+            bin_8 REAL,
+            bin_9 REAL,
+            bin_10 REAL,
+            bin_11 REAL,
+            bin_12 REAL,
+            bin_13 REAL,
+            bin_14 REAL,
+            bin_15 REAL,
+            bin_16 REAL,
+            bin_17 REAL,
+            bin_18 REAL,
+            bin_19 REAL,
+            bin_20 REAL,
+            bin_21 REAL,
+            bin_22 REAL,
+            bin_23 REAL,
+            bin1_mtof REAL,
+            bin3_mtof REAL,
+            bin5_mtof REAL,
+            bin7_mtof REAL,
+            sampling_period REAL,
+            sample_flow_rate REAL,
+            reject_count_glitch REAL,
+            reject_count_longtof REAL,
+            reject_count_ratio REAL,
+            reject_count_outofrange REAL,
+            fan_rev_count REAL,
+            last_status REAL,
+            checksum REAL
+              )
               '''
+
+        print("Created new Readings.db database")
         self.db.execute(sql)
 
     def write_reading(self, gadget_id, **readings):
@@ -201,13 +242,54 @@ class DataSource(ConnectDB):
 
         sql = f'''
               INSERT INTO {self.db_table} 
-                ('timestamp','gadget_id','temp','rh','raw_data')
+                ('timestamp','gadget_id','temp', 'rh', 'pm_01', 'pm_25', 'pm_10', 'bin_0', 'bin_1', 'bin_2', 'bin_3', 'bin_4', 'bin_5', 'bin_6', 'bin_7', 'bin_8', 'bin_9', 'bin_10', 'bin_11', 'bin_12', 'bin_13', 'bin_14', 'bin_15', 'bin_16', 'bin_17', 'bin_18', 'bin_19', 'bin_20', 'bin_21', 'bin_22', 'bin_23', 'bin1_mtof', 'bin3_mtof', 'bin5_mtof', 'bin7_mtof', 'sampling_period', 'sample_flow_rate', 'reject_count_glitch', 'reject_count_longtof', 'reject_count_ratio', 'reject_count_outofrange', 'fan_rev_count', 'last_status', 'checksum')
               VALUES ('{timestamp:%Y-%m-%d %H:%M}',
                 '{gadget_id}', 
                 {readings['temp']},
                 {readings['rh']},
-                '{readings['raw_data']}')
+                {readings['pm_01']},
+                {readings['pm_25'] },
+                {readings['pm_10'] },
+                {readings['bin_0']},
+                {readings['bin_1']},
+                {readings['bin_2']},
+                {readings['bin_3']},
+                {readings['bin_4']},
+                {readings['bin_5']},
+                {readings['bin_6']},
+                {readings['bin_7']},
+                {readings['bin_8']},
+                {readings['bin_9']},
+                {readings['bin_10']},
+                {readings['bin_11']},
+                {readings['bin_12']},
+                {readings['bin_13']},
+                {readings['bin_14']},
+                {readings['bin_15']},
+                {readings['bin_16']},
+                {readings['bin_17']},
+                {readings['bin_18']},
+                {readings['bin_19']},
+                {readings['bin_20']},
+                {readings['bin_21']},
+                {readings['bin_22']},
+                {readings['bin_23']},
+                {readings['bin1_mtof']},
+                {readings['bin3_mtof']},
+                {readings['bin5_mtof']},
+                {readings['bin7_mtof']},
+                {readings['sampling_period']},
+                {readings['sample_flow_rate']},
+                {readings['reject_count_glitch']},
+                {readings['reject_count_longtof'] },
+                {readings['reject_count_ratio']},
+                {readings['reject_count_outofrange']},
+                {readings['fan_rev_count']},
+                {readings['last_status']},
+                {readings['checksum']}
+         )
               '''
+
         self.commit_sql(sql)
 
 

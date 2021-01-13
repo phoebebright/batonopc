@@ -1,0 +1,17 @@
+# note, must have space after colon before settings value
+API: https://tinycloud.purit.ie/api/v1
+DBNAME: ./readings.db
+DB_TABLE: Readings
+BATCH_DBNAME: ./readings.db
+BATCH_TABLE: Batches
+GASCLOUD_KEY: DEMO
+GADGET_ID: TST_001
+GADGET_TYPE: OPCN3
+UPLOAD_INTERVAL_SECS: 3600   # how often batches are uploaded
+LOGGING_INTERVAL_SECS: 300   # how often data is collected from the device
+BATCH_MODE: LIVE
+BATCH_TYPE: OPC
+BATCH_DIR_PENDING: ./batches2upload
+BATCH_DIR_UPLOADED: ./batchesuploaded
+DELETE_BATCH_ON_UPLOAD: False
+DELETE_READING_ON_ZIP: False

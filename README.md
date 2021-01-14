@@ -12,7 +12,7 @@ This documentation is currently assuming the OPC3 is the only device being colle
 
 Time resolution is 1 second.  It is assumed that sub-second readings are not required.
 
-The library is currently setup to write data to https://tinycloud.purit.ie  - a login and device key are required to do this.
+The library is currently setup to write data to https://tinycloud.purit.ie  - a login and gateway key are required to do this.
 
 
 Getting started
@@ -63,12 +63,12 @@ Display 10 recent readings
 Prepare to upload data to Tinycloud
 -------------------------
 
-A valid device_key.txt file is required and this is created by registering the pi with tinycloud.  This requires logging into Tinycloud and selecting Get a Pin.
+A valid gateway_key.txt file is required and this is created by registering the pi with tinycloud.  This requires logging into Tinycloud and selecting Get a Pin.
 Register the pin by running
 
     python3 tinycloud/register.py
 
-You will be asked to enter the pin and the pin will be verified with tinycloud (so must be online to do this).  The device_key.txt will be automatically created.  Running register again will overwrite this file.
+You will be asked to enter the pin and the pin will be verified with tinycloud (so must be online to do this).  The gateway_key.txt will be automatically created.  Running register again will overwrite this file.
 
 Make a batch of data for Tinycloud
 -------------------------

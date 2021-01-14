@@ -383,6 +383,9 @@ class Batcher(SettingsMixin):
         # not the device that is generating the data - although in this instance they are the same thing.
 
         self.gateway_key = self.get_gatewaykey()
+        if not self.gateway_key:
+            raise ValueError("Gateway Key required before upload to cloud")
+
 
         # keep a record of batches in an sqlite table
         self.connect2batchdb()

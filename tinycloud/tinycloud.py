@@ -182,8 +182,8 @@ class DataSource(ConnectDB):
         # want to know if table is created, so check first
         # get the count of tables with the name
         c = self.db.cursor()
-        self.db.execute(f"SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{self.db_table}'")
 
+<<<<<<< HEAD
         # if the count is 1, then table exists
         if c.fetchone():
             print(f'Table {self.db_table} exists.')
@@ -200,6 +200,19 @@ class DataSource(ConnectDB):
                   );
                   '''
             self.db.execute(sql)
+=======
+        sql = f'''
+              CREATE TABLE IF NOT EXISTS {self.db_table} (
+              rdg_no integer PRIMARY KEY AUTOINCREMENT,
+              timestamp text NOT NULL,
+              gadget_id REAL,
+              temp REAL,
+              rh REAL,
+              raw_data VARCHAR
+              );
+              '''
+        self.db.execute(sql)
+>>>>>>> 8e6e116846856f13167920ad92bd0277055719aa
 
     def write_reading(self, gadget_id, **readings):
 

@@ -81,6 +81,7 @@ class OPCN3(DataSource):
 
         #TODO: generate error if n3 is not awake
 
+
         data = self.partic.histogram()
 
         # just pass back a subset for now

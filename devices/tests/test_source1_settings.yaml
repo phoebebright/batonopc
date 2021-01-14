@@ -1,7 +1,0 @@
-# note, must have space after colon before settings value
-GADGET_ID: TST_001
-GASCLOUD_KEY: DEMO
-UPLOAD_INTERVAL_SECS: 3600   # how often batches are uploaded
-LOGGING_INTERVAL_SECS: 300   # how often data is collected from the device
-DBNAME: ./test_readings.db
-DB_TABLE: Readings

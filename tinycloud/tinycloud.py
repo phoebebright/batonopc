@@ -746,7 +746,7 @@ class Batcher(SettingsMixin):
         #     payload['gadget_id'] = self.settings['GADGET_ID']
 
         headers = {f'Authorization': 'Bearer {self.gateway_key}'}
-
+        print(f"Making quarantine request to {self.settings['API']}/quarantine_request/")
         response = requests.post(f"{self.settings['API']}/quarantine_request/" ,
                                  data=payload,
                                  headers=headers)

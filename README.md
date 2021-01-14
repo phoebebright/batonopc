@@ -12,7 +12,7 @@ This documentation is currently assuming the OPC3 is the only device being colle
 
 Time resolution is 1 second.  It is assumed that sub-second readings are not required.
 
-The library is currently setup to write data to https://tinycloud.purit.ie  - a login and device key is required to do this.
+The library is currently setup to write data to https://tinycloud.purit.ie  - a login and device key are required to do this.
 
 
 Getting started
@@ -60,13 +60,24 @@ Get latest reading from the database
     
 Display 10 recent readings
 
+Prepare to upload data to Tinycloud
+-------------------------
+
+A valid device_key.txt file is required and this is created by registering the pi with tinycloud.  This requires logging into Tinycloud and selecting Get a Pin.
+Register the pin by running
+
+    python3 tinycloud/register.py
+
+You will be asked to enter the pin and the pin will be verified with tinycloud (so must be online to do this).  The device_key.txt will be automatically created.  Running register again will overwrite this file.
+
 Make a batch of data for Tinycloud
 -------------------------
+
+Now a batch can be created from readings in the readings database as a result of running log_data.py.
 
     python3 make_batch.py
     
 Creates a directory batches2upload and puts a zip file containing data ready to upload.
-
 
 
 Upload to Tinycloud
@@ -77,16 +88,19 @@ Upload to Tinycloud
 Push any batches in batches2upload to the cloud.  Must have registered the pi as a gateway device with tinycloud and being using a valid gadget_id.
 
 
+Automate logging and uploading
+--------
+Cron jobs can be created to periodically call log_data.py, make_batch.py and pi_to_cloud.py or this code can be used as example code for customised integration.
 
 
-Library Setup
+New Device Setup
 ===============
 
 /devices
 Each new data source/device can be customised in terms of how data is collected and where it is written.  See opcn3.py 
 Each new device can be added to this directory.
 
-/gascloud
+/tinycloud
 Each device inherits from DataSource class in the gascloud directory which has methods for saving and uploading data.  
 
 example files are provided at the root level.  These can be used as a template of how to interact with the library.
@@ -206,17 +220,4 @@ and magic!
 
 
 
-
-Record Types
--------------
-
-Record Type 0 - record the time the batch started in UTC
-~~~~~~~~~~~~~~
-seconds: 0
-value 1: year
-value 2: month
-value 3: day
-value 4: hour
-value 5: minute
-value 6: second
 

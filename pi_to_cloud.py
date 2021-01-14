@@ -10,8 +10,8 @@ def main():
     settings_file = os.path.abspath("settings.yaml")
 
     gc = OPCN3Batcher(settings_file=settings_file)
-    gc.upload_all()
-    print(f"uploading")
+    msg = gc.upload_all()
+    print(msg)
 
 
 if __name__ == '__main__':

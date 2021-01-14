@@ -1,0 +1,5 @@
+*__pycache__*
+gateway_key.txt
+batches2upload/*
+batchesuploaded/*
+settings.yaml

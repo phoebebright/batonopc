@@ -3,23 +3,23 @@ paramiko
 scp
 pyyaml
 pytest
-RPi.GPIO   # pi only
+# RPi.GPIO   # pi only
 sounddevice
 ads1015
 numpy
 pyusbiss
-
-
+djangorestframework
+django_countries
 #git+https://gitlab.com/gascloud/gascloud_pi.git    # currently using tinycloud module in this repo
 git+https://github.com/lizcorson/py-opc@opc-n3
-
+djangorestframework-api-key==1.*
 Django
 environ
 psycopg2-binary
-docutils
 
+django-filter
 
-
+django-post_office
 pendulum
 
 
@@ -47,11 +47,11 @@ jsonfield
 python-memcached
 
 # for api docs
-coreapi
-pygments
-markdown
+# coreapi
+# pygments
+# markdown
+# docutils
 
-ordereddict
 
 python-dateutil
 python-mimeparse
@@ -66,7 +66,7 @@ django-post_office
 
 
 djangorestframework
-markdown
+
 django-filter
 
 PyYAML
@@ -78,9 +78,9 @@ djangorestframework-api-key==1.*
 
 
 
-# development only
-premailer
-django-debug-toolbar
+# # development only
+# premailer
+# django-debug-toolbar
 
 
 

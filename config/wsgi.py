@@ -11,7 +11,6 @@ import os
 import sys
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/home/django/skorie/config/google-creds.json")
 
 app_path = os.path.dirname(os.path.abspath(__file__)).replace('/config', '')
 sys.path.append(app_path)
@@ -22,14 +21,14 @@ from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
 # add this block of code
-try:
-    import uwsgidecorators
-    from django.core.management import call_command
-
-    @uwsgidecorators.timer(10)
-    def send_queued_mail(num):
-        """Send queued mail every 10 seconds"""
-        call_command('send_queued_mail', processes=1)
-
-except ImportError:
-    print("uwsgidecorators not found. Cron and timers are disabled")
+# try:
+#     import uwsgidecorators
+#     from django.core.management import call_command
+#
+#     @uwsgidecorators.timer(10)
+#     def send_queued_mail(num):
+#         """Send queued mail every 10 seconds"""
+#         call_command('send_queued_mail', processes=1)
+#
+# except ImportError:
+#     print("uwsgidecorators not found. Cron and timers are disabled")

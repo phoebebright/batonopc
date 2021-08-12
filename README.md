@@ -32,6 +32,9 @@ Connect OPCN3 to power and via USB to the pi
 
 Expecting to hear fan start or change note, output displayed and fan stops.
 
+Note: ZeroDivisionError: float division by zero
+is caused by bad coding - just run again!
+
 Check there is a settings.yaml file and try:
 
     python3 read_once_opcn3.py

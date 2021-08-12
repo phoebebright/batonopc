@@ -26,4 +26,4 @@ To sync
 
     Right click batonpc (root folder)
     Deployment...
-    Upload to root.... (first option)
+    Upload to root.... (first option)§

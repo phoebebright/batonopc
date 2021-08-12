@@ -65,7 +65,7 @@ class GadgetLogSerializer(serializers.ModelSerializer):
     '''
     class Meta:
         model = GadgetLog
-        fields = ('gadget_ref','action_type', 'action', 'notes', 'when', 'where', 'creator', 'created','data_quality', 'current_quality_id')
+        fields = ('gadget_ref','action_type', 'action', 'notes', 'when', 'where', 'creator', 'created',)
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

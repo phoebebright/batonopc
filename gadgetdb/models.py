@@ -60,12 +60,12 @@ class Gadget(models.Model):
     objects = Gadget_QuerySet().as_manager()
 
     def __str__(self):
-        return f"{self.gadget_model} {self.factory_id}"
+        return self.factory_id
 
 
 
 
-class GadgetLog(DataQualityMixin, CreatedMixin):
+class GadgetLog(CreatedMixin):
 
         ACTION_NOTE = "Note"
         ACTION_ALERT = "Alert"
@@ -120,8 +120,7 @@ class GadgetLog(DataQualityMixin, CreatedMixin):
         def __str__(self):
             return "%s - %s" % (self.gadget, self.action)
 
-        class Meta:
-            abstract = True
+
 
         def save(self, *args, **kwargs):
 

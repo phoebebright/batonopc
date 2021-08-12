@@ -30,16 +30,18 @@ class BaseTestCase(APITestCase):
 
     def setUp(self) -> None:
         super().setUp()
+
+        self.api_key, self.key = APIKey.objects.create_key(name="test-key")
+
         self.client = APIClient()
 
     @classmethod
     def setUpTestData(cls):
         cls.systemuser = CustomUser.system_user()
 
-        cls.gadget1 = "GADGET_1"
-        cls.gadget2 = "GADGET_2"
 
-class TestReadingWrite(BaseTestCase):
+
+class TestWriteReadings(BaseTestCase):
     
     def test_add_reading(self):
         pass

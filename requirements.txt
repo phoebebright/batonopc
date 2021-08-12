@@ -70,12 +70,12 @@ djangorestframework
 django-filter
 
 PyYAML
-
+Pillow
 
 git+https://github.com/phoebebright/django-yamlfield
 git+ssh://git@gitlab.com/gascloud/toolbox.git
-djangorestframework-api-key==1.*
-
+djangorestframework-api-key
+git+https://github.com/hleb-rubanau/django-rest-framework-datatables
 
 
 # # development only

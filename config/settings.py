@@ -253,54 +253,12 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 # ACCOUNT_ACTIVATION_DAYS = 7
 
 
-# django-helpdesk configuration settings
-# You can override django-helpdesk's defaults by redefining them here.
-# To see what settings are available, see the docs/configuration.rst
-# file for more information.
-# Some common settings are below.
-
-HELPDESK_DEFAULT_SETTINGS = {
-            'use_email_as_submitter': True,
-            'email_on_ticket_assign': True,
-            'email_on_ticket_change': True,
-            'login_view_ticketlist': False,
-            'email_on_ticket_apichange': True,
-            'preset_replies': True,
-            'tickets_per_page': 100
-}
-
-#HELPDESK_DEFAULT_TICKET_TYPE = "B"
-
-HELPDESK_STAFF_ONLY_TICKET_OWNERS = True
-
-HELPDESK_TEAMS = False
-
-HELPDESK_USE_CDN = True
-
-HELPDESK_USE_HTTPS_IN_EMAIL_LINK = True
-
-# Should the public web portal be enabled?
-HELPDESK_PUBLIC_ENABLED = False
-HELPDESK_VIEW_A_TICKET_PUBLIC = False
-HELPDESK_SUBMIT_A_TICKET_PUBLIC = False
-
-# Should the Knowledgebase be enabled?
-HELPDESK_KB_ENABLED = True
-
-# Allow users to change their passwords
-HELPDESK_SHOW_CHANGE_PASSWORD = True
-
-# Instead of showing the public web portal first,
-# we can instead redirect users straight to the login page.
-HELPDESK_REDIRECT_TO_LOGIN_BY_DEFAULT = False
-
-
 REST_FRAMEWORK = {
 
 
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        "rest_framework_api_key.permissions.HasAPIKey",
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
@@ -312,10 +270,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 
 }
+API_KEY_CUSTOM_HEADER = "HTTP_BAT_API_KEY"
 
-
-# JSON_EDITOR_JS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.js'
-# JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.css'
 
 # CACHES = {
 #     'default': {

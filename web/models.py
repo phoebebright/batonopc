@@ -128,6 +128,13 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
+    @classmethod
+    def system_user(cls):
+        # need a dummy person instance
+
+        system_user, _ = cls.objects.get_or_create(email="system@batondata.co.uk")
+        return system_user
+
 class Reading(models.Model):
     rdg_no = models.AutoField(primary_key=True)
     timestamp = models.DateTimeField(db_index=True)

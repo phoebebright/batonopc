@@ -9,6 +9,7 @@ from rest_framework import routers
 
 from web.api import ReadingViewset
 from web.views import Landing
+from gadgetdb.api import GadgetViewSet
 
 admin.autodiscover()
 
@@ -17,6 +18,7 @@ router_ro = routers.DefaultRouter()  # readonly apis
 router_enter = routers.DefaultRouter()   # related to entry and review of entries
 
 router.register(r'reading', ReadingViewset)
+router.register(r'gadget', GadgetViewSet)
 
 
 

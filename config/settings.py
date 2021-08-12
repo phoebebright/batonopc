@@ -26,8 +26,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #ROOT_DIR = environ.Path(__file__) - 3  # (skorie/config/settings/base.py - 3 = skorie/)
 
 
-VERSION = "2.1.4 August 2021"
-API_VERSION = "214"
+VERSION = "0.0.1 August 2021"
+API_VERSION = "001"
+API_URL = "https://batondata.co.uk/"
+LOGO_URL = ''
 
 SECRET_KEY = "ABCD"
 
@@ -84,7 +86,7 @@ MIDDLEWARE = [
 
 
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_user_agents.middleware.UserAgentMiddleware',
+    # 'django_user_agents.middleware.UserAgentMiddleware',
 
 
 ]
@@ -112,11 +114,10 @@ INSTALLED_APPS = [
 
     # 'theme',
 
-    #
+    'gadgetdb',
     'web',
 
 ]
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 ROOT_URLCONF = 'config.urls'
 
@@ -303,7 +304,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-        'django_keycloak.auth.backends.KeycloakDRFAuthorizationBackend',
+
     ),
     'DEFAULT_THROTTLE_CLASSES': (
         'rest_framework.throttling.ScopedRateThrottle',

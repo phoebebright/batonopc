@@ -85,3 +85,6 @@ git+https://github.com/hleb-rubanau/django-rest-framework-datatables
 
 
 django-bootstrap-v5
+
+# for backups
+boto3 

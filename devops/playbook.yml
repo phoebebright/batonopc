@@ -1,0 +1,58 @@
+---
+- hosts: all
+  vars:
+    nginx_le_extra_mounts: 
+      - "/home/django/sockets:/home/django/sockets"
+    nginx_le_static_dir: /opt/nginx-letsencrypted/data/storage/static
+    project_name: "{{ playbook_dir | dirname | basename }}"
+  roles:
+    - role: deploy-via-git-pull
+      vars:
+        deployment_project: "{{ project_name }}"
+        deployment_git_workdir: "{{ playbook_dir | dirname }}"
+        deployment_git_subdir: devops
+        deployment_command: ./setup.sh
+        deployment_skip_checkout_on_existing_dir: yes
+    - role: papertrail
+      vars:
+        papertrail_prefixes:
+          - nginx
+          - ansible
+          - backup
+          - deploy
+          - setup
+          #- celery
+          - cron_run
+          - uwsgi
+          - systemd
+          - redis
+          #- memcached
+          #- rabbitmq
+      when: papertrail_destination is defined
+    - docker
+    - role: uwsgi_app
+      vars:
+          uwsgi_config_template: no
+          project_nginx_config_template: "{{ playbook_dir }}/templates/nginx.conf"
+          # project_nginx_config_filename: default.conf
+          project:
+            name: "{{ project_name }}"
+            # virtualenv: change if differs from project name
+            domain: "{{ nginx_le_primary_domain }}"
+            www: no
+            touch_logs: 
+              - uwsgi.log
+              - email.log
+            #extra_writable_dirs:
+            #  - /home/django/data
+            files_to_check_presence: 
+              - config/settings_local.py
+            shared_static_dir: "{{ nginx_le_static_dir }}/{{ project_name }}"
+    - role: django_backup
+      vars:
+        params:
+          project_name: "{{ project_name }}"
+          cron: 
+            hours: 12,23
+            minutes: 10
+    - nginx

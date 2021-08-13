@@ -1,0 +1,28 @@
+---
+#- src: undergreen.prometheus-node-exporter
+- src: https://github.com/hleb-rubanau/ansible-role-docker
+  name: docker
+- src: https://github.com/hleb-rubanau/ansible-role-nginx-letsencrypted
+  name: nginx
+  version: 0.1.1
+- src: https://github.com/hleb-rubanau/ansible-role-deploy-via-git-pull
+  name: deploy-via-git-pull
+  version: 1.4.0
+- src: git@gitlab.com:vividlogic/ansible-roles/papertrail.git
+  scm: git
+- src: git@gitlab.com:vividlogic/ansible-roles/uwsgi_app.git
+  scm: git
+  version: 0.6.0
+- src: git@gitlab.com:vividlogic/ansible-roles/django_backup.git
+  scm: git
+  version: 0.2.0
+- src: git@gitlab.com:vividlogic/ansible-roles/dockerized_nginx_prerequisites.git
+  scm: git
+#- src: git@gitlab.com:vividlogic/ansible-roles/do_spaces_uploader.git
+#  scm: git
+#- src: git@gitlab.com:vividlogic/ansible-roles/influxdb.git
+#  scm: git
+#- src: git@gitlab.com:vividlogic/ansible-roles/celery_broker.git
+#  scm: git
+
+

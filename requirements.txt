@@ -74,7 +74,7 @@ Pillow
 
 git+https://github.com/phoebebright/django-yamlfield
 git+ssh://git@gitlab.com/gascloud/toolbox.git
-djangorestframework-api-key
+
 git+https://github.com/hleb-rubanau/django-rest-framework-datatables
 
 
@@ -85,3 +85,6 @@ git+https://github.com/hleb-rubanau/django-rest-framework-datatables
 
 
 django-bootstrap-v5
+
+# for backups
+boto3 

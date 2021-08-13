@@ -47,7 +47,7 @@
             #  - /home/django/data
             files_to_check_presence: 
               - config/settings_local.py
-            shared_static_dir: "{{ nginx_le_static_dir }}/{{ project.name }}"
+            shared_static_dir: "{{ nginx_le_static_dir }}/{{ project_name }}"
     - role: django_backup
       vars:
         params:

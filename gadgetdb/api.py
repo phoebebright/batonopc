@@ -6,7 +6,10 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import (SessionAuthentication,
+                                           TokenAuthentication)
 from rest_framework_api_key.permissions import HasAPIKey
+from tools.auth import ApiKeyAuthentication
 from rest_framework_datatables.django_filters.backends import DatatablesFilterBackend
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -26,8 +29,8 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 class GadgetViewSet(viewsets.ModelViewSet):
     #permission_classes = [HasAPIKey | IsAuthenticated]
-    authentication_classes = []
-    permission_classes = [HasAPIKey]
+    authentication_classes = [SessionAuthentication, ApiKeyAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Gadget.objects.all()
     serializer_class = GadgetShortSerializer
     lookup_field = 'factory_id'

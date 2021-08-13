@@ -17,16 +17,6 @@ class GadgetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret['owner'] = str(instance.owner)
-        ret['creator'] = str(instance.creator)
-        ret['is_setup'] = "Y" if instance.is_setup() else ""
-        ret['status'] = instance.get_status_display()
-        ret['gadget_model'] = str(instance.gadget_model)
-        return ret
-
 class GadgetShortSerializer(GadgetSerializer):
 
     class Meta:

@@ -28,7 +28,7 @@ class Gadget_QuerySet(models.QuerySet):
 
     pass
 
-class Gadget(models.Model):
+class Gadget(CreatedUpdatedMixin):
     # this is based on the full BaseGadget in tb_devices in the toolbox but with far less fields
 
     STATUS_OUT_OF_SERVICE = "_"
@@ -62,8 +62,21 @@ class Gadget(models.Model):
     def __str__(self):
         return self.factory_id
 
+    def save(self, *args, **kwargs):
+
+        if not self.ref:
+            self.ref = uuid.uuid4()
 
 
+        super().save(*args, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        if getattr(obj, 'creator', None) is None:
+            obj.creator = request.user
+        else:
+            obj.updator = request.user
+            obj.updated = timezone.now()
+        obj.save()
 
 class GadgetLog(CreatedMixin):
 

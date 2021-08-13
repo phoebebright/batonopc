@@ -38,7 +38,7 @@
           project:
             name: "{{ project_name }}"
             # virtualenv: change if differs from project name
-            # domain: "{{ nginx_le_primary_domain }}"
+            domain: "{{ nginx_le_primary_domain }}"
             www: no
             touch_logs: 
               - uwsgi.log

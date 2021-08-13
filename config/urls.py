@@ -7,7 +7,7 @@ from django.urls import include, path, re_path
 from django.views.generic.base import TemplateView
 from rest_framework import routers
 
-from web.api import ReadingViewset
+from web.api import ReadingViewset, ReadingsImportViewset
 from web.views import Landing
 from gadgetdb.api import GadgetViewSet
 
@@ -18,6 +18,7 @@ router_ro = routers.DefaultRouter()  # readonly apis
 router_enter = routers.DefaultRouter()   # related to entry and review of entries
 
 router.register(r'reading', ReadingViewset)
+router.register(r'readings', ReadingsImportViewset)
 router.register(r'gadget', GadgetViewSet)
 
 

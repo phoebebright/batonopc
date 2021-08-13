@@ -48,6 +48,10 @@ class ApiKeyAuthentication(TokenAuthentication):
         if token._has_expired():
             raise AuthenticationFailed('Api key inactive or deleted.')
 
-        user = CustomUser.objects.get(email=token.name)
+        try:
+            user = CustomUser.objects.get(email=token.name)
+        except CustomUser.DoesNotExist:
+            raise AuthenticationFailed(f'Missing user for key name {token.name}')
+
         #user = token.company.users.first()  # what ever you want here
         return (user, token)

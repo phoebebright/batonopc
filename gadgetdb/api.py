@@ -28,7 +28,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 1000
 
 class GadgetViewSet(viewsets.ModelViewSet):
-    #permission_classes = [HasAPIKey | IsAuthenticated]
+
     authentication_classes = [SessionAuthentication, ApiKeyAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Gadget.objects.all()

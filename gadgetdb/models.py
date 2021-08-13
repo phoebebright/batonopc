@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.apps import apps
 from yamlfield.fields import YAMLField
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -77,6 +77,11 @@ class Gadget(CreatedUpdatedMixin):
             obj.updator = request.user
             obj.updated = timezone.now()
         obj.save()
+
+    @property
+    def latest_reading(self):
+        Reading =   apps.get_model('web', 'reading')
+        return Reading.objects.filter(gadget=self).order_by('-timestamp').first()
 
 class GadgetLog(CreatedMixin):
 

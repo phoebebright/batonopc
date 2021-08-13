@@ -1,4 +1,5 @@
 import copy
+import json
 import logging
 
 from datetime import datetime
@@ -12,11 +13,58 @@ from rest_framework import serializers
 from rest_framework.fields import JSONField, CurrentUserDefault
 
 from .models import Reading
+from gadgetdb.models import Gadget
 
 logger = logging.getLogger('django')
 
 class ReadingSerializer(serializers.ModelSerializer):
 
+
+    # rec_no = serializers.IntegerField()
+    timestamp = serializers.DateTimeField()
+    gadget_id = serializers.CharField()
+    temp = serializers.FloatField()
+    rh = serializers.FloatField()
+    # samplingperiod = serializers.FloatField(required=False)
+    # sampleflowrate = serializers.FloatField(required=False)
+    # rejectcountglitch = serializers.FloatField(required=False)
+    # rejectcountlong = serializers.FloatField(required=False)
+    pm_01 = serializers.FloatField()
+    pm_25 = serializers.FloatField()
+    pm_10 = serializers.FloatField()
+    # bin_0 = serializers.FloatField(required=False)
+    # bin_1 = serializers.FloatField(required=False)
+    # bin_2 = serializers.FloatField(required=False)
+    # bin_3 = serializers.FloatField(required=False)
+    # bin_4 = serializers.FloatField(required=False)
+    # bin_5 = serializers.FloatField(required=False)
+    # bin_6 = serializers.FloatField(required=False)
+    # bin_7 = serializers.FloatField(required=False)
+    # bin_8 = serializers.FloatField(required=False)
+    # bin_9 = serializers.FloatField(required=False)
+    # bin_10 = serializers.FloatField(required=False)
+    # bin_11 = serializers.FloatField(required=False)
+    # bin_12 = serializers.FloatField(required=False)
+    # bin_13 = serializers.FloatField(required=False)
+    # bin_14 = serializers.FloatField(required=False)
+    # bin_15 = serializers.FloatField(required=False)
+    # bin1_mtof = serializers.FloatField(required=False)
+    # bin3_mtof = serializers.FloatField(required=False)
+    # bin5_mtof = serializers.FloatField(required=False)
+    # bin7_mtof = serializers.FloatField(required=False)
+    # validation = serializers.CharField(required=False, allow_blank=True)
+    # valid = serializers.BooleanField(required=False)
+
     class Meta:
         model = Reading
-        fields = '__all__'
+        fields = ('timestamp','gadget_id','temp','rh','pm_01','pm_25','pm_10')
+
+
+
+
+
+class ReadingBulkImportSerializer(serializers.Serializer):
+
+    gadget_id = serializers.CharField(required=True)
+    readings = ReadingSerializer(many=True)
+

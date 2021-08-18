@@ -8,19 +8,40 @@ from rest_framework.authentication import (SessionAuthentication,
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django_filters import rest_framework as filters
+from django.db import models as django_models
+from rest_framework.viewsets import ReadOnlyModelViewSet
+
 from tools.auth import ApiKeyAuthentication
 from .models import Reading
 from gadgetdb.models import Gadget
 from .serializers import ReadingSerializer, ReadingBulkImportSerializer
 
+class ReadingFilter(filters.FilterSet):
+    class Meta:
+        model = Reading
+        fields = {
+            'timestamp': ('lte', 'gte')
+        }
 
-class ReadingViewset(viewsets.ModelViewSet):
+    filter_overrides = {
+        django_models.DateTimeField: {
+            'filter_class': filters.IsoDateTimeFilter
+        },
+    }
+
+
+
+class ReadingViewset(ReadOnlyModelViewSet):
     '''single reading api'''
+
     authentication_classes = []
     permission_classes = []
-    queryset = Reading.objects.all()
+    queryset = Reading.objects.all().select_related('gadget')
     serializer_class = ReadingSerializer
-    filterset_fields = [ 'timestamp']
+    filter_class = ReadingFilter
+
+
 
 
 

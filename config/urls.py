@@ -17,7 +17,7 @@ router = routers.DefaultRouter()
 
 
 router.register(r'reading', ReadingViewset)
-router.register(r'readings_in', ReadingsImportViewset)
+router.register(r'readings', ReadingsImportViewset)
 router.register(r'gadget', GadgetViewSet)
 
 

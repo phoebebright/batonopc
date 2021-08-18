@@ -60,7 +60,10 @@ class ReadingSerializer(serializers.ModelSerializer):
         fields = ('timestamp','gadget_id','temp','rh','pm_01','pm_25','pm_10')
 
 
-
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['gadget_id'] = instance.gadget.factory_id
+        return ret
 
 
 class ReadingBulkImportSerializer(serializers.Serializer):

@@ -12,7 +12,7 @@ djangorestframework
 django_countries
 #git+https://gitlab.com/gascloud/gascloud_pi.git    # currently using tinycloud module in this repo
 git+https://github.com/lizcorson/py-opc@opc-n3
-djangorestframework-api-key==1.*
+djangorestframework-api-key
 Django
 environ
 psycopg2-binary

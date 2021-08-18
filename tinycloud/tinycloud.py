@@ -16,6 +16,8 @@ from time import gmtime, strftime
 from pathlib import Path
 from contextlib import closing
 
+import sys
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -483,6 +485,8 @@ class Batcher(SettingsMixin):
         # not the device that is generating the data - although in this instance they are the same thing.
 
         gateway_key = self.get_gatewaykey()
+        if not gateway_key:
+            raise ValueError("Invalid or missing gateway key")
 
         # get range of readings for this batch
         first, last = self.get_reading_range()
@@ -717,20 +721,24 @@ class Batcher(SettingsMixin):
                     status = json.loads(response.content)
                     if status['status'] == "Rejected":
                         print("Batch rejected by quarantine server")
+                        return status
                     elif status['status'] == "Unprocessed":
                         print("Batch successfully uploaded and pending processing")
                         self.batch_uploaded( batch)
                         batches_uploaded.remove(batch)
+                        return status
                     elif status['status'] == "Processed":
                         print("Batch successfully uploaded and processed")
                         self.batch_uploaded( batch)
                         batches_uploaded.remove(batch)
+                        return status
                     else:
                         print(status['status'])
+                        return status
 
                 else:
                     print("Unable to get status")
-                    return
+                    return -1
 
     def upload(self, zipfile):
         '''try uploading a zipfile'''

@@ -16,8 +16,11 @@ from .serializers import ReadingSerializer, ReadingBulkImportSerializer
 
 class ReadingViewset(viewsets.ModelViewSet):
     '''single reading api'''
+    authentication_classes = []
+    permission_classes = []
     queryset = Reading.objects.all()
     serializer_class = ReadingSerializer
+    filterset_fields = [ 'timestamp']
 
 
 

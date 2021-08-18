@@ -163,8 +163,8 @@ STATICFILES_FINDERS = (
 
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'shared_static')
-STATIC_URL = '/shared_static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'shared_static')  # this may well be changed in settings_local in production
+STATIC_URL = '/static/'
 
 
 
@@ -258,7 +258,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        "rest_framework_api_key.permissions.HasAPIKey",
+        # "rest_framework_api_key.permissions.HasAPIKey",
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',

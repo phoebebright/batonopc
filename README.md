@@ -44,7 +44,7 @@ Expecting to see a single reading displayed, eg.
 logging None t:20.0, rh: 52.0, pms: 1.4, 2.6, 6.3
     
 You may get a message: Gateway Key cannot be found
-The gateway key is requried when uploading to the cloud, but for now it can be ignored.
+The gateway key is required when uploading to the cloud, but for now it can be ignored.
 
     
     

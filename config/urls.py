@@ -14,11 +14,10 @@ from gadgetdb.api import GadgetViewSet
 admin.autodiscover()
 
 router = routers.DefaultRouter()
-router_ro = routers.DefaultRouter()  # readonly apis
-router_enter = routers.DefaultRouter()   # related to entry and review of entries
+
 
 router.register(r'reading', ReadingViewset)
-router.register(r'readings', ReadingsImportViewset)
+router.register(r'readings_in', ReadingsImportViewset)
 router.register(r'gadget', GadgetViewSet)
 
 

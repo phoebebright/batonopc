@@ -40,7 +40,11 @@ class BaseTestCase(APITestCase):
     def setUpTestData(cls):
         cls.systemuser = CustomUser.system_user()
 
+class TestAuth(BaseTestCase):
+
     def test_auth_required(self):
+
+        self.url = "/api/v1/readings/"
 
         # fails without auth
         response = self.client.get(self.url, format='json')

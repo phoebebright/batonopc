@@ -3,6 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from csvexport.actions import csvexport
+
 
 from .models import *
 
@@ -91,6 +93,7 @@ admin.site.register(CustomUser, CustomAdmin)
 class ReadingAdmin(admin.ModelAdmin):
     list_display = ('rdg_no','timestamp','gadget','temp', 'rh', 'pm_01', 'pm_10','pm_25')
     list_filter = ('timestamp','gadget',)
+    actions = [csvexport]
 
 admin.site.register(Reading, ReadingAdmin)
 

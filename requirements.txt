@@ -16,7 +16,7 @@ djangorestframework-api-key
 Django
 environ
 psycopg2-binary
-
+django-admin-csvexport
 django-filter
 
 django-post_office

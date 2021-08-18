@@ -9,7 +9,10 @@ class Landing(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['gadgets'] =  Gadget.objects.filter(status=Gadget.STATUS_ACTIVE)
+        if self.request.user.is_authenticated:
+            context['gadgets'] =  Gadget.objects.filter(status=Gadget.STATUS_ACTIVE)
+        else:
+            context['gadgets'] = ''
 
         return context
 

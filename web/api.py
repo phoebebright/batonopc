@@ -18,10 +18,11 @@ from gadgetdb.models import Gadget
 from .serializers import ReadingSerializer, ReadingBulkImportSerializer
 
 class ReadingFilter(filters.FilterSet):
+    gadget = filters.CharFilter(field_name='gadget__factory_id', lookup_expr='iexact')
     class Meta:
         model = Reading
         fields = {
-            'timestamp': ('lte', 'gte')
+            'timestamp': ('lte', 'gte'),
         }
 
     filter_overrides = {

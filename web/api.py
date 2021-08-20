@@ -74,6 +74,6 @@ class ReadingsImportViewset(viewsets.ModelViewSet):
             del reading['gadget_id']
             del reading['timestamp']
 
-            Reading.objects.get_or_create(gadget_id=gadget.id, timestamp=times, defaults=reading)
+            Reading.objects.update_or_create(gadget_id=gadget.id, timestamp=times, defaults=reading)
 
         return Response({'created':len(validated_data['readings'])}, status=status.HTTP_201_CREATED)

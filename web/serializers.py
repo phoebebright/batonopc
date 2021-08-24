@@ -79,3 +79,11 @@ class ReadingBulkImportSerializer(serializers.Serializer):
     gadget_id = serializers.CharField(required=True)
     readings = ReadingSerializer(many=True)
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['gadget_id'] = instance.gadget.factory_id
+        return ret
+
+    def to_internal_value(self, data):
+        ret = super().to_internal_value(data)
+        return ret

@@ -36,8 +36,7 @@ class ReadingFilter(filters.FilterSet):
 class ReadingViewset(ReadOnlyModelViewSet):
     '''single reading api'''
 
-    authentication_classes = []
-    permission_classes = []
+
     queryset = Reading.objects.all().select_related('gadget')
     serializer_class = ReadingSerializer
     filter_class = ReadingFilter
@@ -55,6 +54,7 @@ class ReadingsImportViewset(viewsets.ModelViewSet):
     serializer_class = ReadingBulkImportSerializer
     queryset = Reading.objects.all()
     parser_classes = [JSONParser]
+    http_method_names = ['post',]
 
     def create(self, request, *args, **kwargs):
         # there must be a drf way of doing this - need to parse readings to json

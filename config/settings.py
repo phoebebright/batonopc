@@ -26,8 +26,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #ROOT_DIR = environ.Path(__file__) - 3  # (skorie/config/settings/base.py - 3 = skorie/)
 
 
-VERSION = "0.0.1 August 2021"
-API_VERSION = "001"
+VERSION = "0.0.2 August 2021"
+API_VERSION = "002"
 API_URL = "https://batondata.co.uk/"
 LOGO_URL = ''
 
@@ -258,10 +258,10 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        # "rest_framework_api_key.permissions.HasAPIKey",
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
+        'tools.auth.ApiKeyAuthentication',
 
     ),
     'DEFAULT_THROTTLE_CLASSES': (

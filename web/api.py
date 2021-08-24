@@ -11,7 +11,9 @@ from rest_framework.response import Response
 from django_filters import rest_framework as filters
 from django.db import models as django_models
 from rest_framework.viewsets import ReadOnlyModelViewSet
-
+from rest_framework.decorators import (action, api_view,
+                                       authentication_classes,
+                                       permission_classes, throttle_classes)
 from tools.auth import ApiKeyAuthentication
 from .models import Reading
 from gadgetdb.models import Gadget
@@ -41,9 +43,21 @@ class ReadingViewset(ReadOnlyModelViewSet):
     serializer_class = ReadingSerializer
     filter_class = ReadingFilter
 
+    def get_queryset(self):
 
+        if self.action == "latest":
+            return Reading.objects.order_by('gadget_id', '-timestamp').distinct('gadget_id')
+        else:
+            return  Reading.objects.all().select_related('gadget')
 
+    @action(detail=False, methods=['get'])
+    def latest(self, request, pk=None):
+        '''call to latest will change the queryset used'''
+        return self.list(request, pk)
 
+class ReadingLatestViewset(ReadingViewset):
+
+    queryset = Reading.objects.order_by('gadget_id', '-timestamp').distinct('gadget_id')
 
 
 

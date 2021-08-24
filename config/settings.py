@@ -264,6 +264,7 @@ REST_FRAMEWORK = {
         'tools.auth.ApiKeyAuthentication',
 
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_THROTTLE_CLASSES': (
         'rest_framework.throttling.ScopedRateThrottle',
     ),

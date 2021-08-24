@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from django.utils import dateparse
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -116,6 +117,13 @@ class TestReadReading(BaseTestCase):
         eq_(len(response.data), 2)
         reading1 = response.data[0]
         eq_(reading1['gadget_id'], self.gadget1.factory_id)
+
+    def test_get_latest_readings(self):
+        self.url = "/api/v1/reading/latest/"
+        response = self.client.get(self.url, format='json')
+        eq_(response.status_code, status.HTTP_200_OK)
+        eq_(len(response.data), 1)
+        eq_(dateparse.parse_datetime(response.data[0]['timestamp']), TODAY_STARTS)
 
 class TestBulkImportReadings(BaseTestCase):
 

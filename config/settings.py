@@ -309,7 +309,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['logfile','console','SysLog'],
+            'handlers': ['logfile','console'],
             'level': 'INFO',
             'propagate': True,
         },

@@ -24,8 +24,16 @@ Authentication - Using a key
 
 A custom tag HTTP_BAT_API_KEY is used to identify the token, so a call using a python request that adds the api to the header looks like this:
 
-r = requests.post(settings.BATON_API_URL, json=payload,
+to post data to the API::
+
+    r = requests.post(https://batondata.co.uk/api/v1/readings/, json=payload,
                               headers={'Authorization': f'HTTP_BAT_API_KEY {settings.BATON_API_KEY}'})
+
+To get data from the API::
+
+    r = requests.get("https://batondata.co.uk/api/v1/reading/latest/", headers={'Authorization': f'HTTP_BAT_API_KEY {settings.BATON_API_KEY}'})
+
+See web/tests/test_api.py for examples
 
 
 Filtering

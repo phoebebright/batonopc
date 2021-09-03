@@ -26,8 +26,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #ROOT_DIR = environ.Path(__file__) - 3  # (skorie/config/settings/base.py - 3 = skorie/)
 
 
-VERSION = "0.0.2 August 2021"
-API_VERSION = "002"
+VERSION = "0.0.3 September 2021"
+API_VERSION = "003"
 API_URL = "https://batondata.co.uk/"
 LOGO_URL = ''
 
@@ -148,12 +148,12 @@ NOTIFY_NEW_USER_EMAILS = "phoebebright310@gmail.com"
 EMAIL_BACKEND = 'post_office.EmailBackend'
 
 MESSAGE_TAGS = {
-        messages.DEBUG: 'alert-secondary',
-        messages.INFO: 'alert-info',
-        messages.SUCCESS: 'alert-success',
-        messages.WARNING: 'alert-warning',
-        messages.ERROR: 'alert-danger',
- }
+    messages.DEBUG: 'alert-secondary',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 # Static files (CSS, JavaScript, Images)
 
@@ -209,36 +209,6 @@ COUNTRIES_ONLY = ['US', 'GB', 'IE', 'AU', 'NZ','CA']
 
 
 
-
-# ALLAUTH settings
-#
-#
-# SOCIALACCOUNT_PROVIDERS = {
-#     'whinie_oa2': {
-#         'PROVIDER_URL': 'https://api.whin.ie/o',
-#         'SCOPE': ['read', 'write', 'introspection'],  # remove introspection once worked out how to get email in complete_login
-#     },
-#     'facebook': {
-#         'METHOD': 'oauth2',
-#         'SCOPE': ['email', 'public_profile'],
-#         'AUTH_PARAMS': {'auth_type': 'https'},
-#         #'AUTH_PARAMS': {'auth_type': 'reauthenticate'},  this will require people re-enter their password in facebook
-#         'INIT_PARAMS': {'cookie': True},
-#         'FIELDS': [
-#             'id',
-#             'email',
-#             'first_name',
-#             'last_name',
-#         ],
-#         'EXCHANGE_TOKEN': True,
-#         # 'LOCALE_FUNC': 'path.to.callable',
-#         'VERIFIED_EMAIL': False,
-#         'VERSION': 'v2.12',
-#     }
-# }
-#
-# SOCIALACCOUNT_ADAPTER = 'web.views.DCSocialAccountAdapter'
-
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_EMAIL_VERIFICATION = "none"   # currently using custom signup if not facebook
@@ -281,103 +251,86 @@ API_KEY_CUSTOM_HEADER = "HTTP_BAT_API_KEY"
 #     }
 # }
 
-#
-#
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#
-#     'filters': {
-#         'require_debug_false': {
-#             '()': 'django.utils.log.RequireDebugFalse'
-#         }
-#     },
-#     'formatters': {
-#         'standard': {
-#             'format': '%(levelname)s %(asctime)s %(module)s  %(message)s'
-#         },
-#         "post_office": {
-#             "format": "[%(levelname)s]%(asctime)s PID %(process)d: %(message)s",
-#             "datefmt": "%d-%m-%Y %H:%M",
-#         },
-#     },
-#
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'standard',
-#         },
-#         'logfile': {
-#             'level': 'DEBUG',
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             'maxBytes': 1024 * 1024 * 5,  # 5 MB
-#             'backupCount': 5,
-#             'filename': os.path.join(BASE_DIR, "logs/django.log"),
-#             'formatter': 'standard',
-#         },
-#
-#
-#         # 'email': {
-#         #     'level': 'DEBUG',
-#         #     'class': 'logging.handlers.RotatingFileHandler',
-#         #     'maxBytes': 1024 * 1024 * 5,  # 5 MB
-#         #     'backupCount': 5,
-#         #     'filename': os.path.join(BASE_DIR, "logs/email.log"),
-#         #     'formatter': 'standard',
-#         # },
-#
-#         # "post_office": {
-#         #     "level": "DEBUG",
-#         #     'class': 'logging.handlers.RotatingFileHandler',
-#         #     'maxBytes': 1024 * 1024 * 5,  # 5 MB
-#         #     'backupCount': 5,
-#         #     'filename': os.path.join(BASE_DIR, "logs/postoffice.log"),
-#         #     "formatter": "post_office"
-#         # },
-#         # 'mail_admins': {
-#         #     'level': 'ERROR',
-#         #     'filters': ['require_debug_false'],
-#         #     'class': 'django.utils.log.AdminEmailHandler'
-#         # },
-#
-#         # everything that goes to syslog goes to papertrail https://papertrailapp.com/systems/1848252051/events
-#         # 'SysLog': {
-#         #     'level': 'DEBUG',
-#         #     'class': 'logging.handlers.SysLogHandler',
-#         #     'formatter': 'standard',
-#         #     'address': ('logs6.papertrailapp.com', 34636)
-#         # },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['logfile','console','SysLog'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#
-#
-#         'email': {
-#             'handlers': ['email', ],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#
-#         # "post_office": {
-#         #     "handlers": ["post_office",],
-#         #     "level": "INFO"
-#         # },
-#
-#         'javascript_error': {
-#             'handlers': [ 'logfile','console','SysLog'],
-#             'level': 'ERROR',
-#             'propagate': True,
-#         },
-#         'django.utils.autoreload': {
-#             'level': 'INFO',
-#         },
-#     },
-# }
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'formatters': {
+        'standard': {
+            'format': '%(levelname)s %(asctime)s %(module)s  %(message)s'
+        },
+        "post_office": {
+            "format": "[%(levelname)s]%(asctime)s PID %(process)d: %(message)s",
+            "datefmt": "%d-%m-%Y %H:%M",
+        },
+    },
+
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+        'logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'filename': os.path.join(BASE_DIR, "logs/django.log"),
+            'formatter': 'standard',
+        },
+
+
+        'email': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'filename': os.path.join(BASE_DIR, "logs/email.log"),
+            'formatter': 'standard',
+        },
+
+        "post_office": {
+            "level": "DEBUG",
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'filename': os.path.join(BASE_DIR, "logs/postoffice.log"),
+            "formatter": "post_office"
+        },
+
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['logfile','console','SysLog'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+
+
+        'email': {
+            'handlers': ['email', ],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+
+        "post_office": {
+            "handlers": ["post_office",],
+            "level": "INFO"
+        },
+
+        'django.utils.autoreload': {
+            'level': 'INFO',
+        },
+    },
+}
 
 
 try:

@@ -85,6 +85,7 @@ class ReadingsImportViewset(viewsets.ModelViewSet):
 
         gadget, _ = Gadget.objects.get_or_create(factory_id=validated_data['gadget_id'], defaults={
             'created': timezone.now,
+            'creator': request.user,
         })
         times = None
         for reading in validated_data['readings']:

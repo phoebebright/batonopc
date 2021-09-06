@@ -136,9 +136,16 @@ class TestBulkImportReadings(BaseTestCase):
 
     def test_import(self):
 
+        # gadget = Gadget.objects.get(factory_id="OPC R2")
+        # last_received_data = gadget.last_received_data
+
         payload = {'gadget_id': 'OPC R2', 'readings': [
             {'rec_no': 3, 'gadget_id': 'OPC R2', 'temp': 37.4, 'rh': 17.6, 'samplingperiod': 30.2, 'sampleflowrate': 5.5, 'rejectcountglitch': 255.0, 'rejectcountlong': 42.0, 'pm_01': 1.6, 'pm_25': 11.2, 'pm_10': 122.0, 'bin_0': 1613, 'bin_1': 197, 'bin_2': 240, 'bin_3': 10, 'bin_4': 5, 'bin_5': 4, 'bin_6': 3, 'bin_7': 284, 'bin_8': 0, 'bin_9': 0, 'bin_10': 0, 'bin_11': 0, 'bin_12': 0, 'bin_13': 0, 'bin_14': 0, 'bin_15': 1, 'bin1_mtof': 56, 'bin3_mtof': 81, 'bin5_mtof': 99, 'bin7_mtof ': 112, 'validation': '', 'valid': True, 'timestamp': '2021-06-05T13:40:00'},
             {'rec_no': 4, 'gadget_id': 'OPC R2', 'temp': 37.2, 'rh': 17.5, 'samplingperiod': 7.5, 'sampleflowrate': 5.5, 'rejectcountglitch': 206.0, 'rejectcountlong': 9.0, 'pm_01': 1.8, 'pm_25': 12.2, 'pm_10': 121.3, 'bin_0': 365, 'bin_1': 45, 'bin_2': 79, 'bin_3': 5, 'bin_4': 3, 'bin_5': 2, 'bin_6': 1, 'bin_7': 71, 'bin_8': 0, 'bin_9': 0, 'bin_10': 0, 'bin_11': 0, 'bin_12': 0, 'bin_13': 0, 'bin_14': 0, 'bin_15': 0, 'bin1_mtof': 59, 'bin3_mtof': 90, 'bin5_mtof': 87, 'bin7_mtof ': 119, 'validation': '', 'valid': True, 'timestamp': '2021-06-05T13:41:00'}]}
 
         response = self.client.post(self.url, data=payload, format='json')
         eq_(response.status_code, status.HTTP_201_CREATED)
+
+        # check last_received_data is updated
+        gadget = Gadget.objects.get(factory_id="OPC R2")
+        eq_(gadget.last_received_data.replace(tzinfo=None), dateparse.parse_datetime("2021-06-05T13:41:00"))

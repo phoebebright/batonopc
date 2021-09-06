@@ -1,4 +1,6 @@
 import json
+
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework import filters, generics, mixins, status, viewsets
 from rest_framework import authentication
@@ -81,7 +83,10 @@ class ReadingsImportViewset(viewsets.ModelViewSet):
 
         validated_data = serializer.validated_data
 
-        gadget, _ = Gadget.objects.get_or_create(factory_id=validated_data['gadget_id'])
+        gadget, _ = Gadget.objects.get_or_create(factory_id=validated_data['gadget_id'], defaults={
+            'created': timezone.now,
+        })
+        times = None
         for reading in validated_data['readings']:
             #TODO: if gadget != reading gadget - raise alarm
             times = reading['timestamp']
@@ -89,5 +94,13 @@ class ReadingsImportViewset(viewsets.ModelViewSet):
             del reading['timestamp']
 
             Reading.objects.update_or_create(gadget_id=gadget.id, timestamp=times, defaults=reading)
+
+        # bump last_received_data field in gadget if applicable
+        if times:
+            gadget.last_received_data = times
+            gadget.save(update_fields=['last_received_data'])
+
+        # check gadget created date was added
+        assert gadget.created != None
 
         return Response({'created':len(validated_data['readings'])}, status=status.HTTP_201_CREATED)

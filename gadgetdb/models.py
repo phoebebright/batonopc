@@ -59,6 +59,9 @@ class Gadget(CreatedUpdatedMixin):
 
     objects = Gadget_QuerySet().as_manager()
 
+    class Meta:
+        ordering = ('factory_id',)
+
     def __str__(self):
         return self.factory_id
 

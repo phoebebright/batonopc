@@ -689,6 +689,8 @@ class Batcher(SettingsMixin):
 
                     # There may be batches that were successfully uploaded but did not get an update status in time
                     # We don't want to upload them again, so just add them to the list of files to do a status check on
+
+                    #TODO: URGENTLY!  Match using regex = '[T-Fa-f0-9]{32}' NOT len of filename
                     if len(filename) == 36:
                         batchid = filename[:32]
                         batches_uploaded.append(batchid)

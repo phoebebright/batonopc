@@ -178,11 +178,8 @@ class Reading(models.Model):
     sampleflowrate = models.FloatField(blank=True, null=True)
     rejectcountglitch = models.FloatField(blank=True, null=True)
     rejectcountlong = models.FloatField(blank=True, null=True)
-    # reject_count_ratio = models.FloatField(blank=True, null=True)
-    # reject_count_outofrange = models.FloatField(blank=True, null=True)
-    # fan_rev_count = models.FloatField(blank=True, null=True)
-    # last_status = models.FloatField(blank=True, null=True)
-    # checksum = models.FloatField(blank=True, null=True)
+    source_ref = models.CharField(max_length=45, blank=True, null=True)
+
 
     def __str__(self):
         return str(self.rdg_no)

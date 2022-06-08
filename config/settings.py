@@ -26,8 +26,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 #ROOT_DIR = environ.Path(__file__) - 3  # (skorie/config/settings/base.py - 3 = skorie/)
 
 
-VERSION = "0.0.5 September 2021"
-API_VERSION = "004"
+VERSION = "0.0.6 June 2022"
+API_VERSION = "006"
 API_URL = "https://batondata.co.uk/"
 LOGO_URL = ''
 

@@ -57,12 +57,15 @@ class ReadingSerializer(serializers.ModelSerializer):
     sampleflowrate = serializers.FloatField(required=False)
     rejectcountglitch = serializers.FloatField(required=False)
     rejectcountlong = serializers.FloatField(required=False)
+
+    source_ref = serializers.CharField(required=False)
+
     # validation = serializers.CharField(required=False, allow_blank=True)
     # valid = serializers.BooleanField(required=False)
 
     class Meta:
         model = Reading
-        fields = ('timestamp','gadget_id','temp','rh','pm_01','pm_25','pm_10','bin_0','bin_1','bin_2','bin_3','bin_4','bin_5','bin_6','bin_7','bin_8','bin_9','bin_10','bin_11','bin_12','bin_13','bin_14','bin_15','bin1_mtof','bin3_mtof','bin5_mtof','bin7_mtof','samplingperiod','sampleflowrate','rejectcountglitch','rejectcountlong')
+        fields = ('timestamp','gadget_id','temp','rh','pm_01','pm_25','pm_10','bin_0','bin_1','bin_2','bin_3','bin_4','bin_5','bin_6','bin_7','bin_8','bin_9','bin_10','bin_11','bin_12','bin_13','bin_14','bin_15','bin1_mtof','bin3_mtof','bin5_mtof','bin7_mtof','samplingperiod','sampleflowrate','rejectcountglitch','rejectcountlong', 'source_ref')
 
 
     def to_representation(self, instance):
@@ -77,6 +80,7 @@ class ReadingSerializer(serializers.ModelSerializer):
 class ReadingBulkImportSerializer(serializers.Serializer):
 
     gadget_id = serializers.CharField(required=True)
+    source_ref = serializers.CharField(required=False)
     readings = ReadingSerializer(many=True)
 
     def to_representation(self, instance):

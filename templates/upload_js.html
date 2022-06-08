@@ -1,0 +1,254 @@
+<!---- quarantine request succeeds but call to quarantine server fails with CORS --->
+<!DOCTYPE html>
+
+<html>
+
+
+
+
+<head>
+    <script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>
+</head>
+
+<body>
+
+<form
+        id="upload"
+        name="upload"
+        method="POST"
+        enctype="multipart/form-data"
+        action=""
+        class="needs-validation"
+>
+
+
+    <input type="hidden" id="batchid" name="batchid" value="">
+    <input type="hidden" id="device" name="device" value="362c1ba628124095a9ab">
+    <input type="hidden" id="source_ref" name="source_ref" value="testing">
+    <input type="hidden" id="batch_mode" name="batch_type" value="LIVE">
+    <input type="hidden" id="batch_type" name="batch_type" value="SKVID">
+    <input type="hidden" id="gadget_id" name="gadget_id" value="">
+
+
+    <div class="row batch_details SKVID" >
+
+
+        <div class="form-group my-3">
+            <input type="file" id="file1" name="file1"  accept=" video/*" class="form-control file2upload"  placeholder="Data file"  required  />
+
+            <p id="size" class="mt-3"></p>
+        </div>
+    </div>
+
+
+
+            <button id="submit" type="submit" class="btn btn-primary btn-lg btn-block">Upload</button>
+
+
+
+
+</form>
+
+
+                            <div id="progress_text"></div>
+
+                            <div class="progress my-3">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+
+                            <div id="status"></div>
+
+
+<script>
+
+
+    var uploaded = false;
+    var qrqst_url = "https://tinycloud.purit.ie/api/v1/quarantine_request/";
+
+ $(document).on("submit", "#upload", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+            upload_start();
+return false;
+    });
+
+
+    function upload_start() {
+
+            upload(qrqst_url, upload_success, upload_fail);
+        console.log("back");
+    }
+    function upload_success(data) {
+        uploaded = true;
+
+        const payload = {
+            batchid: data.batch.id,
+            filename: $("#file1").val(),
+        }
+
+
+
+        $("#submit").text("Uploaded")
+        $("#success").slideDown();
+    }
+    function upload_fail(data) {
+        uploaded = false;
+        $('div#status').text("Failure! " + data.status + " " + data.statusText);
+        $("#submit").text("Failed")
+        $("#fail").slideDown();
+    }
+
+
+
+
+    function no_zip_send(creds, formdata, callback_success, callback_fail) {
+        /* if there is just one file and it's a video, then not much point in zipping */
+
+        // var file_list = $(".file2upload");
+        // $.each(file_list, function() {
+        //     formdata.delete(this.name);
+        // });
+        //
+        //     var zipped = new File([content], creds.batchid + '.zip',{type: "zip"});
+        //     formdata.append("file",zipped);
+
+        $('div#progress_text').append("<br />Step 3 of 3 - uploading video file...");
+
+        // ready to upload formdata
+        upload_files(creds, formdata, callback_success, callback_fail);
+
+    }
+
+    function upload(qrqst_url, callback_success, callback_fail) {
+        // 1. do a quarantine request to get the batchid and credentials to use for upload
+
+
+        $('div#progress_text').html("Step 1 of 3 - validating request... ");
+
+        // either have two files in .file2upload or multiple files in .filelist2upload
+        // this is messy and should be imrpoved
+
+
+        var filelist = [];
+        $.each($(".file2upload"), function() {
+
+            if ($(this).val().length) {
+                filelist.push($(this).val().split('\\').pop());
+            }
+        });
+
+
+        filelist = filelist.join();
+
+        var payload = {
+            key: $("#device").val(),
+            filelist: filelist,
+            gadget_id: $("#gadget_id").val(),
+            source_ref: $("#source_ref").val(),
+            batch_type: $("#batch_type").val(),
+            batch_mode: $("#batch_mode").val(),
+
+        };
+
+        // first do a quarantine request to get the batch ID
+        //TODO: instead of sending customised settings in attributes, generate a yaml file.
+        $.ajax({
+            type: "POST",
+            url: qrqst_url,
+
+               crossDomain: true,  // remove for production
+   dataType: 'json',  //json for production
+
+            data: payload,
+
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', 'Bearer 7727c59995d843f2a8a5');
+            },
+        })
+            .done(function (creds) {
+
+                $('div#progress_text').append("Granted<br />Step 2 of 3 - preparing video to send...");
+                // put batchid in form then upload files and form data
+                $("#batchid").val(creds.batchid);
+
+
+                // we can't use jquery's .serialize() as we have multipart/formdata
+                // exclude files - these will be added as a single zip
+                //TODO: need to remove files from formdata OR create it without them - line below does not work
+                //var formdata = new FormData($('#upload :input:not(input[type=file])'));
+                var formdata = new FormData($('#upload')[0]);
+
+                //zip_and_send(creds, formdata, callback_success, callback_fail);
+                no_zip_send(creds, formdata, callback_success, callback_fail);
+
+            })
+            .fail(function(data) {
+                if (typeof callback_fail != "undefined") {
+                    callback_fail(data);
+                }
+
+            });
+
+
+
+        return false; // prevent old-school page reload
+    }
+
+
+    function upload_files(creds, formdata, callback_success, callback_fail){
+
+        // 3. Upload to quarantine server (specified in creds)
+
+        $.ajax({
+            type: 'POST',
+            url: "https://"+creds.domain+"/upload",
+            crossDomain: true,
+            dataType: 'json',
+            data: formdata,           // because multipart/formdata
+            contentType: false,       // because multipart/formdata
+            processData: false,       // because multipart/formdata
+            headers: {
+                'X-Gascloud-Logas': $("#device").val(),
+                'X-Gascloud-Logpw': creds.batchid,
+            },
+
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+
+                xhr.upload.addEventListener('progress', function(e) {
+
+                    if (e.lengthComputable) {
+
+                        var progress = parseInt((e.loaded / e.total) *100);
+                        $('.progress-bar').css('width', progress+'%').attr('aria-valuenow', progress);
+
+                    }
+                });
+
+                return xhr;
+            },
+        }).done(function (data) {
+            $('div#progress_text').fadeOut();
+            $('div#progress').fadeOut();
+
+            console.log(data);
+
+            if (typeof callback_success != "undefined") {
+                callback_success(data);
+            }
+
+        }).fail(function (data) {
+            if (typeof callback_fail != "undefined") {
+                callback_fail(data);
+            }
+
+        });
+
+
+    }
+
+</script>
+</body>
+
+
+</html>

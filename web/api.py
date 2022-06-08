@@ -94,7 +94,8 @@ class ReadingsImportViewset(viewsets.ModelViewSet):
             del reading['gadget_id']
             del reading['timestamp']
 
-            Reading.objects.update_or_create(gadget_id=gadget.id, timestamp=times, defaults=reading)
+            Reading.objects.update_or_create(gadget_id=gadget.id, timestamp=times, source_ref=validated_data['source_ref'],
+                                             defaults=reading)
 
         # bump last_received_data field in gadget if applicable
         if times:
